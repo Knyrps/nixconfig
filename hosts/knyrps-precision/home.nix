@@ -5,7 +5,7 @@
 
   xdg.dataFile."StreamController/plugins/DiscordSC".source = inputs.discord-sc;
 
-  wayland.windowManager.niri.settings.input.touch.map-to-output = "DP-2";
+  wayland.windowManager.niri.settings.input.touch.map-to-output = "HP Inc. Slice20 Unknown";
 
   wayland.windowManager.niri.settings._children = [
     {
@@ -34,7 +34,7 @@
     }
     {
       output = {
-        _args = [ "DP-2" ];
+        _args = [ "HP Inc. Slice20 Unknown" ];
         mode = "1440x960@59.938";
         scale = 1.0;
         position._props = { x = 3176; y = 1440; };
