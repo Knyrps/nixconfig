@@ -41,7 +41,7 @@ in
         id = 1;
         isDefault = !config.features.firefox-personal.enable;
         settings = fx.sharedSettings // {
-          "browser.startup.homepage" = "https://kagi.com";
+          "browser.startup.homepage" = "https://myapps.microsoft.com";
           "browser.startup.page" = 1;
           "privacy.sanitize.sanitizeOnShutdown" = false;
           "browser.toolbars.bookmarks.visibility" = "always";
