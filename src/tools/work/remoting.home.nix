@@ -19,7 +19,6 @@ in
           wrapProgram $out/bin/sdl-freerdp --set SDL_VIDEODRIVER wayland
         '';
       })
-      remmina
     ];
   };
 }
