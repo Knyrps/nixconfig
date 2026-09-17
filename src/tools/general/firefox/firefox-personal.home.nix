@@ -59,7 +59,7 @@ in
         isDefault = true;
         path = "56h1f58e.default";
         settings = fx.sharedSettings // {
-          "browser.startup.homepage" = "https://myapps.microsoft.com";
+          "browser.startup.homepage" = "https://kagi.com";
           "browser.startup.page" = 1;
         };
         search = {
