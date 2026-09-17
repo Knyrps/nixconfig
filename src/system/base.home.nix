@@ -8,5 +8,7 @@
     vim
     jq
     pciutils
+    hyfetch
+    fastfetch
   ];
 }
