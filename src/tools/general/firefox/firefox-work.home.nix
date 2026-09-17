@@ -43,9 +43,14 @@ in
         settings = fx.sharedSettings // {
           "browser.startup.homepage" = "https://myapps.microsoft.com";
           "browser.startup.page" = 1;
-          "browser.shell.checkDefaultBrowser" = false;
           "privacy.sanitize.sanitizeOnShutdown" = false;
           "browser.toolbars.bookmarks.visibility" = "always";
+        };
+        search = {
+          force = true;
+          default = "google";
+          privateDefault = "google";
+          engines = fx.searchEngines;
         };
         extensions = {
           force = true;
