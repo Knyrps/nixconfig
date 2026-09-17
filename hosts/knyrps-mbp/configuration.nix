@@ -63,5 +63,7 @@
 
   host.roles = [ "ui" "laptop" "bluetooth" "networkmanager" "coding" ];
 
+  features.ssh.unsafe = true;
+
   system.stateVersion = "26.05";
 }

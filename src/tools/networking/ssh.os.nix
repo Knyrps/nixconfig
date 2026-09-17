@@ -5,16 +5,19 @@ let
   has = config.host.has;
 in
 {
-  options.features.ssh.enable = lib.mkEnableOption "ssh" // {
-    default = has "ssh";
+  options.features.ssh = {
+    enable = lib.mkEnableOption "ssh" // {
+      default = has "ssh";
+    };
+    unsafe = lib.mkEnableOption "password login";
   };
 
   config = lib.mkIf cfg.enable {
     services.openssh = {
       enable = true;
       settings = {
-        PasswordAuthentication = false;
-        KbdInteractiveAuthentication = false;
+        PasswordAuthentication = cfg.unsafe;
+        KbdInteractiveAuthentication = cfg.unsafe;
       };
     };
   };
