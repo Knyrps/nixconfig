@@ -10,14 +10,25 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    programs.zed-editor.enable = true;
+    programs.zed-editor = {
+      enable = true;
 
-    home.packages = with pkgs; [
-      nil
-      nixd
-      luau
-      luau-lsp
-      (writeShellScriptBin "zed" ''
+      extensions = [ "nix" "lua" "luau" ];
+
+      extraPackages = with pkgs; [
+        nil nixd
+        lua-language-server
+        luau luau-lsp
+      ];
+
+      userSettings.lsp = {
+        lua-language-server.binary.path = lib.getExe pkgs.lua-language-server;
+        luau-lsp.binary.path            = lib.getExe pkgs.luau-lsp;
+      };
+    };
+
+    home.packages = [
+      (pkgs.writeShellScriptBin "zed" ''
         exec ${config.programs.zed-editor.package}/bin/zeditor --add "$@"
       '')
     ];
