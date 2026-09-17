@@ -1,4 +1,4 @@
-{ osConfig, config, lib, pkgs, ... }:
+{ osConfig, config, lib, ... }:
 
 let
   cfg = config.features.kitty;
@@ -11,6 +11,5 @@ in
 
   config = lib.mkIf cfg.enable {
     programs.kitty.enable = true;
-    home.packages = [ pkgs.alacritty ];
   };
 }

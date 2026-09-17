@@ -3,9 +3,10 @@
 lib.mkIf osConfig.features.niri.enable {
   wayland.windowManager.niri.enable = true;
 
-  home.sessionVariables.NIXOS_OZONE_WL = "1";
+  programs.fuzzel.enable = true;
 
   home.packages = with pkgs; [
+    swaylock
     grim
     slurp
     satty

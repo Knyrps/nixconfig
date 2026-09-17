@@ -24,12 +24,8 @@ let
     sitecore-extensions
   ];
 
-  workFirefox = config.programs.firefox.finalPackage.override (old: {
-    extraPolicies = (old.extraPolicies or { }) // { };
-  });
-
   workBrowser = pkgs.writeShellScriptBin "work-browser" ''
-    exec ${workFirefox}/bin/firefox -P work --no-remote --name work-browser "$@"
+    exec ${config.programs.firefox.finalPackage}/bin/firefox -P work --no-remote --name work-browser "$@"
   '';
 in
 {
