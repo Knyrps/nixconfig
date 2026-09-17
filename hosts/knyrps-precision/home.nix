@@ -5,6 +5,8 @@
 
   xdg.dataFile."StreamController/plugins/DiscordSC".source = inputs.discord-sc;
 
+  wayland.windowManager.niri.settings.input.touch.map-to-output = "DP-2";
+
   wayland.windowManager.niri.settings._children = [
     {
       output = {
