@@ -61,7 +61,7 @@
     };
   };
 
-  host.roles = [ "ui" "laptop" "ssh" "bluetooth" "networkmanager" "personal" "work" "coding" "gaming" ];
+  host.roles = [ "ui" "laptop" "bluetooth" "networkmanager" "coding" ];
 
   system.stateVersion = "26.05";
 }
