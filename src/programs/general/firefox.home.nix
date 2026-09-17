@@ -68,6 +68,13 @@ let
     netflix-household-no-more
   ];
 
+  sharedSettings = {
+    "extensions.autoDisableScopes" = 0;
+    "identity.fxaccounts.toolbar.enabled" = false;
+    "browser.profiles.enabled" = false;
+    "browser.aboutConfig.showWarning" = false;
+  };
+
   workFirefox = config.programs.firefox.finalPackage.override (old: {
     extraPolicies = (old.extraPolicies or { }) // {
 
@@ -104,7 +111,7 @@ in
         id = 0;
         isDefault = true;
         path = "56h1f58e.default";
-        settings."extensions.autoDisableScopes" = 0;
+        settings = sharedSettings;
         extensions = {
           force = true;
           packages = common ++ private;
@@ -114,13 +121,11 @@ in
       work = {
         id = 1;
         isDefault = false;
-        settings = {
+        settings = sharedSettings // {
           "browser.startup.homepage" = "https://myapps.microsoft.com";
           "browser.startup.page" = 1;
           "browser.shell.checkDefaultBrowser" = false;
           "privacy.sanitize.sanitizeOnShutdown" = false;
-          "browser.aboutConfig.showWarning" = false;
-          "extensions.autoDisableScopes" = 0;
           "browser.toolbars.bookmarks.visibility" = "always";
         };
         extensions = { force = true; packages = common ++ work; };
