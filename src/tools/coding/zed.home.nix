@@ -23,7 +23,10 @@ in
 
       userSettings.lsp = {
         lua-language-server.binary.path = lib.getExe pkgs.lua-language-server;
-        luau-lsp.binary.path            = lib.getExe pkgs.luau-lsp;
+        luau-lsp.binary = {
+          path = lib.getExe pkgs.luau-lsp;
+          arguments = [ "lsp" ];
+        };
       };
     };
 
