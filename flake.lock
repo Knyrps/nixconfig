@@ -1,25 +1,5 @@
 {
   "nodes": {
-    "basalt-launcher": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1789120902,
-        "narHash": "sha256-vsJJJHuLfC7S6bl/td7V+NXYTvSGR395eo42gKv+DcI=",
-        "owner": "MegalithOfficial",
-        "repo": "basalt-launcher",
-        "rev": "36b4f165e0bd7a11eec5a6da5d156d5661f8b11a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "MegalithOfficial",
-        "repo": "basalt-launcher",
-        "type": "github"
-      }
-    },
     "discord-sc": {
       "flake": false,
       "locked": {
@@ -145,13 +125,11 @@
     },
     "root": {
       "inputs": {
-        "basalt-launcher": "basalt-launcher",
         "discord-sc": "discord-sc",
         "home-manager": "home-manager",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_2",
         "nur": "nur",
-        "spicetify-nix": "spicetify-nix",
         "t2fanrd": "t2fanrd",
         "xwayland-satellite": "xwayland-satellite"
       }
@@ -174,42 +152,6 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
-    "spicetify-nix": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "systems": "systems"
-      },
-      "locked": {
-        "lastModified": 1789291406,
-        "narHash": "sha256-lfZ7yAaTZMuAzOSLjJ7ivrKIFk0E11koWTVgkWSXwuE=",
-        "owner": "Gerg-L",
-        "repo": "spicetify-nix",
-        "rev": "09eed5c95105aada9ffabd4c7eb6b345dc4ba66f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Gerg-L",
-        "repo": "spicetify-nix",
-        "type": "github"
-      }
-    },
-    "systems": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
         "type": "github"
       }
     },
