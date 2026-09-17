@@ -12,9 +12,6 @@
     networkmanager = {
       enable = true;
     };
-
-    # TODO: find a place for this
-    extraHosts = "192.168.2.210 REDACTED REDACTED";
   };
 
   services.openssh = {
