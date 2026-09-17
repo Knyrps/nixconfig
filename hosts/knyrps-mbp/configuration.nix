@@ -1,4 +1,6 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+
+{
   imports = [
     ./hardware-configuration.nix
   ];
@@ -8,17 +10,6 @@
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
-
-    # boot.blacklistedKernelModules = [ "i915" ];
-
-    # blacklistedKernelModules = [
-    #   "snd_hda_intel"
-    # ];
-
-    # extraModprobeConfig = ''
-    #   install snd_hda_intel ${pkgs.coreutils}/bin/false
-    # '';
-
     consoleLogLevel = 3;
   };
 
@@ -39,14 +30,8 @@
       }))
     ];
 
-    apple-t2 = {
-      enableIGPU = true;
-      # kernelChannel = "latest";
-    };
+    apple-t2.enableIGPU = true;
   };
-
-  networking.networkmanager.enable = true;
-  system.stateVersion = "26.05";
 
   services.t2fanrd = {
     enable = true;
@@ -75,4 +60,8 @@
       '';
     };
   };
+
+  host.roles = [ "ui" "laptop" "ssh" "bluetooth" "networkmanager" "personal" "work" "coding" "gaming" ];
+
+  system.stateVersion = "26.05";
 }

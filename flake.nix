@@ -26,7 +26,6 @@
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # nixos-hardware.url = "github:NixOS/nixos-hardware";
     nixos-hardware.url = "github:soopyc/nixos-hardware/apple-t2-updates";
   };
 
@@ -45,7 +44,8 @@
             useGlobalPkgs = true;
             useUserPackages = true;
             extraSpecialArgs = { inherit inputs; };
-            users.knyrps = ./home.nix;
+            users.knyrps.imports = [ ./home.nix ]
+              ++ nixpkgs.lib.optional (builtins.pathExists ./hosts/${name}/home.nix) ./hosts/${name}/home.nix;
             backupFileExtension = "hm-bak";
           };
         }
@@ -58,6 +58,7 @@
         nixos-hardware.nixosModules.apple-t2
         t2fanrd.nixosModules.t2fanrd
       ];
+      headless         = mkHost "headless" [ ];
     };
   };
 }
