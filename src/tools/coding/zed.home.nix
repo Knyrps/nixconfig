@@ -15,6 +15,8 @@ in
     home.packages = with pkgs; [
       nil
       nixd
+      luau
+      luau-lsp
       (writeShellScriptBin "zed" ''
         exec ${config.programs.zed-editor.package}/bin/zeditor --add "$@"
       '')
