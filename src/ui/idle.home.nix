@@ -16,10 +16,10 @@ in
         { timeout = 600; command = "swaylock -f"; }
         { timeout = 900; command = "niri msg action power-off-monitors"; }
       ];
-      events = [
-        { event = "before-sleep"; command = "swaylock -f"; }
-        { event = "lock"; command = "swaylock -f"; }
-      ];
+      events = {
+        before-sleep = "swaylock -f";
+        lock = "swaylock -f";
+      };
     };
   };
 }
