@@ -59,6 +59,12 @@ in
         isDefault = true;
         path = "56h1f58e.default";
         settings = fx.sharedSettings;
+        search = {
+          force = true;
+          default = "kagi";
+          privateDefault = "kagi";
+          engines = fx.searchEngines;
+        };
         extensions = {
           force = true;
           packages = fx.common ++ private;
