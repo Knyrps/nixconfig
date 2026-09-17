@@ -14,14 +14,6 @@
       url = "github:Supreeeme/xwayland-satellite";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    basalt-launcher = {
-      url = "github:MegalithOfficial/basalt-launcher";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    spicetify-nix = {
-      url = "github:Gerg-L/spicetify-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     discord-sc = {
       url = "github:oparada1988/DiscordSC";
       flake = false;

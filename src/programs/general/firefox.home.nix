@@ -115,7 +115,12 @@ in
         id = 1;
         isDefault = false;
         settings = {
-          # …existing…
+          "browser.startup.homepage" = "https://myapps.microsoft.com";
+          "browser.startup.page" = 1;
+          "browser.shell.checkDefaultBrowser" = false;
+          "privacy.sanitize.sanitizeOnShutdown" = false;
+          "browser.aboutConfig.showWarning" = false;
+          "extensions.autoDisableScopes" = 0;
           "browser.toolbars.bookmarks.visibility" = "always";
         };
         extensions = { force = true; packages = common ++ work; };
