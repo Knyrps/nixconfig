@@ -4,7 +4,7 @@ let
   cfg = config.features.zed;
   has = osConfig.host.has;
 
-  prettier = {
+  prettierFmt = {
     formatter.external = {
       command = lib.getExe pkgs.prettier;
       arguments = [ "--stdin-filepath" "{buffer_path}" ];
@@ -41,6 +41,21 @@ in
         omnisharp-roslyn       # native binary — Zed's auto-download won't run on NixOS
       ];
 
+      userKeymaps = [
+        {
+          context = "Terminal";
+          bindings = {
+            "ctrl-v" = "terminal::Paste";
+          };
+        }
+        {
+          context = "Terminal && selection";
+          bindings = {
+            "ctrl-c" = "terminal::Copy";
+          };
+        }
+      ];
+
       userSettings = {
         # Point Zed at Nix's node so it stops trying to download its own
         node = {
@@ -64,7 +79,7 @@ in
           "JavaScript" "TypeScript" "TSX"
           "Vue.js" "HTML" "CSS" "SCSS"
           "JSON" "JSONC" "YAML" "Markdown"
-        ] (_: prettier);
+        ] (_: prettierFmt);
       };
     };
 
