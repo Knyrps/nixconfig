@@ -13,6 +13,7 @@ in
     home.packages = with pkgs; [
       vesktop
       whatsapp-electron
+      signal-desktop
     ];
   };
 }
