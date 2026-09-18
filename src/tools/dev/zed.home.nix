@@ -4,10 +4,15 @@ let
   cfg = config.features.zed;
   has = osConfig.host.has;
 
+  tabWidth = 4;
+
   prettierFmt = {
     formatter.external = {
       command = lib.getExe pkgs.prettier;
-      arguments = [ "--stdin-filepath" "{buffer_path}" ];
+      arguments = [
+        "--stdin-filepath" "{buffer_path}"
+        "--tab-width" (toString tabWidth)
+      ];
     };
     format_on_save = "on";
   };
@@ -43,6 +48,12 @@ in
 
       userKeymaps = [
         {
+          context = "Editor";
+          bindings = {
+            "ctrl-#" = "editor::ToggleComments";
+          };
+        }
+        {
           context = "Terminal";
           bindings = {
             "ctrl-v" = "terminal::Paste";
@@ -57,6 +68,10 @@ in
       ];
 
       userSettings = {
+        # 4-space indentation everywhere; languages below inherit it
+        tab_size = tabWidth;
+        hard_tabs = false;
+
         # Point Zed at Nix's node so it stops trying to download its own
         node = {
           path = lib.getExe pkgs.nodejs;
