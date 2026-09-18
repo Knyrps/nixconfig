@@ -83,6 +83,9 @@ in
       };
     };
 
+    home.file."${config.xdg.configHome}/zed/snippets".source =
+      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/code/zed-snippets";
+
     home.packages = [
       (pkgs.writeShellScriptBin "zed" ''
         exec ${config.programs.zed-editor.package}/bin/zeditor --add "$@"
