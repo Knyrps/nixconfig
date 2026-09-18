@@ -13,6 +13,8 @@
 
   host.roles = [ "ui" "laptop" "ssh" "bluetooth" "networkmanager" "personal" "work" "coding" "gaming" ];
 
+  programs.nh.flake = "~/code/nix";
+
   features.ssh.unsafe = true;
 
   system.stateVersion = "26.05";
