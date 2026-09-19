@@ -1,5 +1,18 @@
 { osConfig, lib, pkgs, ... }:
 
+let
+  # hyprpicker shells out to wl-copy and notify-send, so put them on its PATH
+  # instead of relying on whatever the session happens to export.
+  hyprpicker = pkgs.symlinkJoin {
+    name = "hyprpicker-wrapped";
+    paths = [ pkgs.hyprpicker ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/hyprpicker \
+        --prefix PATH : ${lib.makeBinPath [ pkgs.wl-clipboard pkgs.libnotify ]}
+    '';
+  };
+in
 lib.mkIf osConfig.features.niri.enable {
   wayland.windowManager.niri.enable = true;
 
@@ -14,6 +27,7 @@ lib.mkIf osConfig.features.niri.enable {
     libnotify
     wev
     nwg-displays
+    hyprpicker # the wrapped one from the let block, not pkgs.hyprpicker
   ];
 
   wayland.windowManager.niri.settings = {
@@ -98,6 +112,10 @@ lib.mkIf osConfig.features.niri.enable {
       "Mod+V".spawn-sh = "noctalia msg panel-toggle clipboard";
       "Mod+Shift+S".spawn-sh = "noctalia msg screenshot-region";
       "Mod+Ctrl+Shift+S".spawn-sh = "noctalia msg screenshot-annotate";
+      "Mod+Shift+C" = {
+        _props = { repeat = false; hotkey-overlay-title = "Pick a Color: hyprpicker"; };
+        spawn = [ "hyprpicker" "--autocopy" "--notify" "--format=hex" ];
+      };
 
       "XF86AudioRaiseVolume" = { _props.allow-when-locked = true; spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0"; };
       "XF86AudioLowerVolume" = { _props.allow-when-locked = true; spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-"; };
