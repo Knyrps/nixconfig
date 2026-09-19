@@ -16,6 +16,16 @@ let
     };
     format_on_save = "on";
   };
+
+  # vtsls only emits inlay hints when asked to; Zed's inlay_hints toggle alone isn't enough
+  tsInlayHints.inlayHints = {
+    parameterNames = { enabled = "all"; suppressWhenArgumentMatchesName = true; };
+    parameterTypes.enabled = true;
+    variableTypes = { enabled = true; suppressWhenTypeMatchesName = true; };
+    propertyDeclarationTypes.enabled = true;
+    functionLikeReturnTypes.enabled = true;
+    enumMemberValues.enabled = true;
+  };
 in
 {
   options.features.zed.enable = lib.mkEnableOption "zed" // {
@@ -72,6 +82,25 @@ in
         tab_size = tabWidth;
         hard_tabs = false;
 
+        # Keep the signature popover up while the cursor is inside a call's parentheses,
+        # and bring it back after accepting a completion or typing a bracket pair.
+        auto_signature_help = true;
+        show_signature_help_after_edits = true;
+
+        # Snappier hover docs
+        hover_popover_delay = 150;
+
+        # Inline parameter names and inferred types
+        inlay_hints = {
+          enabled = true;
+          show_type_hints = true;
+          show_parameter_hints = true;
+          show_other_hints = true;
+          show_background = false;
+          edit_debounce_ms = 700;
+          scroll_debounce_ms = 50;
+        };
+
         # Point Zed at Nix's node so it stops trying to download its own
         node = {
           path = lib.getExe pkgs.nodejs;
@@ -87,6 +116,10 @@ in
           omnisharp.binary = {
             path = lib.getExe pkgs.omnisharp-roslyn;
             arguments = [ "-lsp" ];
+          };
+          vtsls.settings = {
+            javascript = tsInlayHints;
+            typescript = tsInlayHints;
           };
         };
 
