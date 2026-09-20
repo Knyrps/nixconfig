@@ -1,4 +1,4 @@
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, ... }:
 
 let
   cfg = config.features.niri;
@@ -11,7 +11,5 @@ in
   config = lib.mkIf cfg.enable {
     programs.niri.enable = true;
     environment.sessionVariables.NIXOS_OZONE_WL = "1";
-    environment.systemPackages = [ pkgs.xwayland-satellite ];
-    nixpkgs.overlays = [ inputs.xwayland-satellite.overlays.default ];
   };
 }

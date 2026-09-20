@@ -1,34 +1,7 @@
-{ osConfig, lib, pkgs, ... }:
+{ osConfig, lib, ... }:
 
-let
-  # hyprpicker shells out to wl-copy and notify-send, so put them on its PATH
-  # instead of relying on whatever the session happens to export.
-  hyprpicker = pkgs.symlinkJoin {
-    name = "hyprpicker-wrapped";
-    paths = [ pkgs.hyprpicker ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      wrapProgram $out/bin/hyprpicker \
-        --prefix PATH : ${lib.makeBinPath [ pkgs.wl-clipboard pkgs.libnotify ]}
-    '';
-  };
-in
 lib.mkIf osConfig.features.niri.enable {
   wayland.windowManager.niri.enable = true;
-
-  programs.fuzzel.enable = true;
-
-  home.packages = with pkgs; [
-    swaylock
-    grim
-    slurp
-    satty
-    wl-clipboard
-    libnotify
-    wev
-    nwg-displays
-    hyprpicker # the wrapped one from the let block, not pkgs.hyprpicker
-  ];
 
   wayland.windowManager.niri.settings = {
     clipboard.disable-primary = [ ];

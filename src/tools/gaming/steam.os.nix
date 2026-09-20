@@ -10,13 +10,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = with pkgs; [ mangohud vulkan-tools ];
-
-    programs.gamescope = {
-      enable = true;
-      capSysNice = true;
-    };
-
     programs.steam = {
       enable = true;
       remotePlay.openFirewall = true;
