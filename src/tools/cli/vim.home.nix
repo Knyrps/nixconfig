@@ -1,5 +1,14 @@
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
+let
+  cfg = config.features.vim;
+in
 {
-  home.packages = [ pkgs.vim ];
+  options.features.vim.enable = lib.mkEnableOption "vim" // {
+    default = true;
+  };
+
+  config = lib.mkIf cfg.enable {
+    home.packages = [ pkgs.vim ];
+  };
 }

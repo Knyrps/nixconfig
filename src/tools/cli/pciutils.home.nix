@@ -1,5 +1,14 @@
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
+let
+  cfg = config.features.pciutils;
+in
 {
-  home.packages = [ pkgs.pciutils ];
+  options.features.pciutils.enable = lib.mkEnableOption "pciutils" // {
+    default = true;
+  };
+
+  config = lib.mkIf cfg.enable {
+    home.packages = [ pkgs.pciutils ];
+  };
 }

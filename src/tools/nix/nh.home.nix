@@ -1,5 +1,14 @@
-{ ... }:
+{ config, lib, ... }:
 
+let
+  cfg = config.features.nh;
+in
 {
-  programs.nh.enable = true;
+  options.features.nh.enable = lib.mkEnableOption "nh" // {
+    default = true;
+  };
+
+  config = lib.mkIf cfg.enable {
+    programs.nh.enable = true;
+  };
 }
