@@ -6,10 +6,7 @@ let
   addons = pkgs.nur.repos.rycee.firefox-addons;
   common = with addons; [ ublock-origin ipvfoo ];
 
-  # Firefox has no pref for keyboard shortcuts, so swap the <key> elements from
-  # the autoconfig sandbox once each browser window is up.
   keybindings = pkgs.writeText "firefox-keybindings.cfg" ''
-    // Swap Ctrl+Shift+N and Ctrl+Shift+P: private window on N, reopen closed window on P.
     (function () {
       var swap = [
         ["key_privatebrowsing", "N"],
@@ -23,12 +20,10 @@ let
           for (var i = 0; i < swap.length; i++) {
             var el = doc.getElementById(swap[i][0]);
             if (!el) return;
-            // Drop the Fluent id so localization cannot restore the old key.
             el.removeAttribute("data-l10n-id");
             el.setAttribute("key", swap[i][1]);
             keyset = el.parentNode;
           }
-          // Re-inserting the keyset forces XUL to rebuild its shortcut table.
           keyset.parentNode.appendChild(keyset);
         } catch (e) {
           Components.utils.reportError(e);
@@ -57,7 +52,6 @@ in
       allow = packages:
         lib.genAttrs (map (p: p.addonId) packages) (_: {
           installation_mode = "allowed";
-          # A per-id entry replaces the "*" entry outright, so this has to be set here.
           private_browsing = true;
         });
 

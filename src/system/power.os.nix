@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   cfg = config.features.power;
@@ -12,6 +12,5 @@ in
   config = lib.mkIf cfg.enable {
     services.upower.enable = true;
     services.power-profiles-daemon.enable = true;
-    environment.systemPackages = [ pkgs.brightnessctl ];
   };
 }

@@ -2,10 +2,11 @@
 
 let
   cfg = config.features.fonts;
+  has = config.host.has;
 in
 {
   options.features.fonts.enable = lib.mkEnableOption "fonts" // {
-    default = config.host.has "ui";
+    default = has "ui";
   };
 
   config = lib.mkIf cfg.enable {

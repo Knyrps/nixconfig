@@ -2,10 +2,11 @@
 
 let
   cfg = config.features.audio;
+  has = config.host.has;
 in
 {
   options.features.audio.enable = lib.mkEnableOption "audio" // {
-    default = config.host.has "ui";
+    default = has "ui";
   };
 
   config = lib.mkIf cfg.enable {
