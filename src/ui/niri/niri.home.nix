@@ -87,7 +87,7 @@ lib.mkIf osConfig.features.niri.enable {
       "Mod+Ctrl+Shift+S".spawn-sh = "noctalia msg screenshot-annotate";
       "Mod+Shift+C" = {
         _props = { repeat = false; hotkey-overlay-title = "Pick a Color: hyprpicker"; };
-        spawn = [ "hyprpicker" "--autocopy" "--notify" "--format=hex" ];
+        spawn = "pick-color";
       };
 
       "XF86AudioRaiseVolume" = { _props.allow-when-locked = true; spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0"; };
