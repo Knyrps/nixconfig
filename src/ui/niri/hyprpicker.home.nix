@@ -10,15 +10,13 @@ in
 
   config = lib.mkIf cfg.enable {
     home.packages = [
-      (pkgs.symlinkJoin {
-        name = "hyprpicker";
-        paths = [ pkgs.hyprpicker ];
-        buildInputs = [ pkgs.makeWrapper ];
-        postBuild = ''
-          wrapProgram $out/bin/hyprpicker \
-            --prefix PATH : ${lib.makeBinPath [ pkgs.wl-clipboard pkgs.libnotify ]}
-        '';
-      })
+      (pkgs.writeShellScriptBin "pick-color" ''
+        color=$(${lib.getExe pkgs.hyprpicker} --no-fancy --lowercase-hex --format=hex) || exit 0
+        [ -n "$color" ] || exit 0
+        printf '%s' "$color" | ${lib.getExe' pkgs.wl-clipboard "wl-copy"}
+        ${lib.getExe' pkgs.libnotify "notify-send"} \
+          -t 5000 -i color-select-symbolic "Color Picker" "Selected color: $color"
+      '')
     ];
   };
 }
