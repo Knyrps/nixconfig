@@ -1,5 +1,14 @@
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
+let
+  cfg = config.features.fastfetch;
+in
 {
-  home.packages = [ pkgs.fastfetch ];
+  options.features.fastfetch.enable = lib.mkEnableOption "fastfetch" // {
+    default = true;
+  };
+
+  config = lib.mkIf cfg.enable {
+    home.packages = [ pkgs.fastfetch ];
+  };
 }
