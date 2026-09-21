@@ -15,7 +15,7 @@ in
 
       package = pkgs.bibata-cursors;
       name = "Bibata-Modern-Amber";
-      size = 20;
+      size = 18;
 
       x11.enable = true;
       gtk.enable = true;
