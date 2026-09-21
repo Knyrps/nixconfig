@@ -14,7 +14,7 @@ in
       enable = true;
 
       package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Ice";
+      name = "Bibata-Modern-Amber";
       size = 20;
 
       x11.enable = true;
