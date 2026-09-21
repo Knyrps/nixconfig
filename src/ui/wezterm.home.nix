@@ -30,6 +30,23 @@ in
             { key = "R", mods = "CTRL",       action = wezterm.action.DisableDefaultAssignment },
             { key = "R", mods = "SHIFT|CTRL", action = wezterm.action.DisableDefaultAssignment },
             { key = "F5", mods = "CTRL",      action = wezterm.action.ReloadConfiguration },
+
+            -- match zed's terminal: ctrl+c copies only when something is
+            -- selected, otherwise it stays SIGINT. ctrl+v always pastes.
+            {
+              key = "c",
+              mods = "CTRL",
+              action = wezterm.action_callback(function(window, pane)
+                local sel = window:get_selection_text_for_pane(pane)
+                if sel and sel ~= "" then
+                  window:perform_action(wezterm.action.CopyTo "ClipboardAndPrimarySelection", pane)
+                  window:perform_action(wezterm.action.ClearSelection, pane)
+                else
+                  window:perform_action(wezterm.action.SendKey { key = "c", mods = "CTRL" }, pane)
+                end
+              end),
+            },
+            { key = "v", mods = "CTRL", action = wezterm.action.PasteFrom "Clipboard" },
           },
         }
       '';

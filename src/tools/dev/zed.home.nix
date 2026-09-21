@@ -78,6 +78,9 @@ in
       ];
 
       userSettings = {
+        # match the login shell instead of zed's default /bin/sh
+        terminal.shell.program = lib.getExe pkgs.fish;
+
         # 4-space indentation everywhere; languages below inherit it
         tab_size = tabWidth;
         hard_tabs = false;
