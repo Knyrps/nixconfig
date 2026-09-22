@@ -30,12 +30,12 @@ let
     sha256 = "sha256-RlucI8ZyVqb6N/J1MKJz9GXyyOYiyByzgrGxrtlZd8I=";
   };
 
-  opensubtitles = fx.xpi {
-    pname = "opensubtitles";
-    version = "6.3.8";
-    addonId = "{fa13934b-65d0-4632-b49e-5e4f6cba9168}";
-    url = "https://addons.mozilla.org/firefox/downloads/file/4175578/opensubtitles-6.3.8.xpi";
-    sha256 = "sha256-SVw3YIbIAqsEuxgk7MHBExudF5rQ6BzuwMV164GIhXM=";
+  substital = fx.xpi {
+    pname = "substital";
+    version = "2.10.6";
+    addonId = "jid1-Cn7LiNrWh4k6RA@jetpack";
+    url = "https://addons.mozilla.org/firefox/downloads/file/4771616/substital-2.10.6.xpi";
+    sha256 = "sha256-aL9sGHkCqzRtnXPPW1vUOQYqT9QKCAZKE1N6yxwmoTM=";
   };
 
   private = with addons; [
@@ -51,7 +51,7 @@ let
     gifs-for-github
     aw-watcher-web
     netflix-household-no-more
-    opensubtitles
+    substital
   ];
 in
 {
