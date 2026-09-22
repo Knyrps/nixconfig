@@ -9,7 +9,7 @@ lib.mkIf osConfig.features.noctalia.enable {
       lockscreen_widgets.enabled = false;
 
       plugins = {
-        enabled = [ "knyrps/nix-search" ];
+        enabled = [ "knyrps/nix-search" "lucasoe/proton-pass" ];
         source = [
           { name = "official"; kind = "git"; location = "https://github.com/noctalia-dev/official-plugins"; }
           { name = "community"; kind = "git"; location = "https://github.com/noctalia-dev/community-plugins"; }
