@@ -13,7 +13,7 @@ lib.mkIf osConfig.features.noctalia.enable {
         source = [
           { name = "official"; kind = "git"; location = "https://github.com/noctalia-dev/official-plugins"; }
           { name = "community"; kind = "git"; location = "https://github.com/noctalia-dev/community-plugins"; }
-          { name = "dev"; kind = "path"; location = "/home/knyrps/code/noctalia/local-plugins/"; }
+          # { name = "dev"; kind = "path"; location = "/home/knyrps/code/noctalia/local-plugins/"; }
         ];
       };
 
