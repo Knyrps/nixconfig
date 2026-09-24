@@ -34,8 +34,8 @@ in
           HostName = "REDACTED";
           User = "REDACTED\\REDACTED";
           AddressFamily = "inet";
-          ServerAliveInterval = 15;
-          ServerAliveCountMax = 3;
+          ServerAliveInterval = 1;
+          ServerAliveCountMax = 30;
         };
       };
     };
