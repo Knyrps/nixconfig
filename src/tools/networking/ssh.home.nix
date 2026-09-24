@@ -34,8 +34,8 @@ in
           HostName = "DE-0CX038986239";
           User = "KERNGRUPPE\\valentin.pommee";
           AddressFamily = "inet";
-          ServerAliveInterval = 15;
-          ServerAliveCountMax = 3;
+          ServerAliveInterval = 1;
+          ServerAliveCountMax = 30;
         };
       };
     };
