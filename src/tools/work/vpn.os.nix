@@ -64,10 +64,18 @@ in
       # /run/pluto and the /var/lib/ipsec/nss the database lives in
       systemd.tmpfiles.packages = [ pkgs.libreswan ];
 
-      # libreswan's own default config. the runtime `ipsec start --config` the
-      # plugin passes overrides it per connection, but checknss below reads the
-      # default one to find nssdir.
-      environment.etc."ipsec.conf".source = lib.mkDefault "${pkgs.libreswan}/etc/ipsec.conf";
+      # pluto is started by the package unit against this file, and the per
+      # connection config the plugin hands to `ipsec add` cannot override a
+      # global. libreswan 5 defaults to ikev1-policy=drop, which refuses the
+      # connection at load time: "global ikev1-policy=drop does not allow IKEv1
+      # connections". l2tp/ipsec with a pre-shared key is ikev1, so it has to be
+      # accepted here. otherwise this matches the file the package ships.
+      environment.etc."ipsec.conf".text = lib.mkDefault ''
+        config setup
+          ikev1-policy=accept
+
+        include /etc/ipsec.d/*.conf
+      '';
 
       # libreswan's `ipsec start` is a wrapper that defers to `systemctl start
       # ipsec.service`, so the unit the package ships has to be installed or the
