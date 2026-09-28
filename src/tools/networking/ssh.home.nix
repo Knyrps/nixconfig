@@ -20,23 +20,17 @@ in
       # HashKnownHosts, carried over below.
       enableDefaultConfig = false;
 
-      settings = {
-        "*" = {
-          HashKnownHosts = false;
+      # work hosts name an employer's machines and accounts, so they stay out of
+      # this repo. ssh keeps the first value it finds per keyword and includes
+      # are emitted above the blocks below, so ~/.ssh/work.d/* wins.
+      includes = lib.optional (has "work") "work.d/*";
 
-          # drop dead connections after ~45s instead of hanging
-          ServerAliveInterval = 15;
-          ServerAliveCountMax = 3;
-        };
-      }
-      // lib.optionalAttrs (has "work") {
-        worklaptop = {
-          HostName = "REDACTED";
-          User = "REDACTED\\REDACTED";
-          AddressFamily = "inet";
-          ServerAliveInterval = 1;
-          ServerAliveCountMax = 30;
-        };
+      settings."*" = {
+        HashKnownHosts = false;
+
+        # drop dead connections after ~45s instead of hanging
+        ServerAliveInterval = 15;
+        ServerAliveCountMax = 3;
       };
     };
   };
