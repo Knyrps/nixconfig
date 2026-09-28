@@ -156,6 +156,13 @@ in
             # answers with NO_PROPOSAL_CHOSEN -- windows rras does not do pfs
             # for phase 2. phase 1 is unaffected and still comes up.
             ipsec-pfs = "no";
+
+            # the ipsec sa comes up and then l2tp gets nothing back at all
+            # (ESP in=0B out=665B) because this host sits behind nat. nat
+            # traversal does not generally work for l2tp from behind a nat
+            # while the source port is 1701; this drops leftprotoport from the
+            # ipsec selector and has xl2tpd bind a random high port instead.
+            ephemeral-port = "yes";
           };
 
           vpn-secrets = {
