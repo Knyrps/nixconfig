@@ -69,22 +69,25 @@ in
       # default one to find nssdir.
       environment.etc."ipsec.conf".source = lib.mkDefault "${pkgs.libreswan}/etc/ipsec.conf";
 
-      # pluto refuses to start without an nss database. checknss creates one and
-      # is a no-op once it exists; upstream's own unit runs it the same way.
-      systemd.services.ipsec-initnss = {
-        description = "Initialise the libreswan NSS database";
-        wantedBy = [ "multi-user.target" ];
-        before = [ "NetworkManager.service" ];
-        path = with pkgs; [ libreswan nssTools ];
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-          ExecStart = "${pkgs.libreswan}/sbin/ipsec checknss";
-        };
-      };
+      # libreswan's `ipsec start` is a wrapper that defers to `systemctl start
+      # ipsec.service`, so the unit the package ships has to be installed or the
+      # plugin dies on "Unit ipsec.service not found". no wantedBy: pluto only
+      # needs to run while the vpn is up, and the plugin starts it on demand.
+      systemd.packages = [ pkgs.libreswan ];
 
-      # `ipsec` is a shell script that shells out to all of these, and it is
-      # networkmanager that spawns it, so they have to be on *its* path.
+      # the unit's ExecStartPre (checknss, checknflog) and pluto itself shell out
+      # to these; the package unit carries no path of its own.
+      systemd.services.ipsec.path = with pkgs; [
+        libreswan
+        iproute2
+        procps
+        nssTools
+        iptables
+        nettools
+      ];
+
+      # `ipsec` is a shell script that shells out to the same set, and it is
+      # networkmanager that spawns it, so they have to be on *its* path too.
       systemd.services.NetworkManager.path = with pkgs; [
         libreswan
         iproute2
