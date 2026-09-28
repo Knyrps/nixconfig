@@ -3,6 +3,15 @@
 let
   cfg = config.features.work-vpn;
   has = config.host.has;
+
+  # strongswan 6 dropped the ikev1 implementation entirely, and l2tp/ipsec with
+  # a pre-shared key is ikev1 -- charon starts fine and then answers the
+  # initiate with "IKE version 1 not supported". libreswan still implements it.
+  #
+  # the plugin picks its daemon at runtime by running the ipsec binary nixpkgs
+  # patches into it and matching the vendor string in --version, so swapping
+  # the input over is enough to move it onto libreswan wholesale.
+  plugin = pkgs.networkmanager-l2tp.override { strongswan = pkgs.libreswan; };
 in
 {
   options.features.work-vpn = {
@@ -37,7 +46,7 @@ in
 
   config = lib.mkIf cfg.enable (lib.mkMerge [
     {
-      networking.networkmanager.plugins = [ pkgs.networkmanager-l2tp ];
+      networking.networkmanager.plugins = [ plugin ];
 
       systemd.tmpfiles.rules = [
         # the plugin writes the psk to /etc/ipsec.d/ipsec.nm-l2tp.secrets, which
@@ -52,22 +61,38 @@ in
         "d ${dirOf cfg.secretsFile} 0700 root root -"
       ];
 
-      # strongswan aborts library_init outright when /etc/strongswan.conf is
-      # missing ("no files found matching" -> "abort initialization due to
-      # invalid configuration"), and nixpkgs ships its config only as templates
-      # under share/strongswan. the starter reports that as exit code 64, which
-      # it prints as "integrity test of libstrongswan failed" -- nothing to do
-      # with integrity.
-      #
-      # the upstream template can't be used verbatim either: it sets
-      # load_modular = yes, and every plugin snippet nixpkgs installs under
-      # strongswan.d is zero-length, so charon resolves no crypto at all and
-      # dies on "unmet dependency: NONCE_GEN". an empty charon block skips
-      # modular loading and keeps the compiled-in plugin list.
-      environment.etc."strongswan.conf".text = lib.mkDefault ''
-        charon {
-        }
-      '';
+      # /run/pluto and the /var/lib/ipsec/nss the database lives in
+      systemd.tmpfiles.packages = [ pkgs.libreswan ];
+
+      # libreswan's own default config. the runtime `ipsec start --config` the
+      # plugin passes overrides it per connection, but checknss below reads the
+      # default one to find nssdir.
+      environment.etc."ipsec.conf".source = lib.mkDefault "${pkgs.libreswan}/etc/ipsec.conf";
+
+      # pluto refuses to start without an nss database. checknss creates one and
+      # is a no-op once it exists; upstream's own unit runs it the same way.
+      systemd.services.ipsec-initnss = {
+        description = "Initialise the libreswan NSS database";
+        wantedBy = [ "multi-user.target" ];
+        before = [ "NetworkManager.service" ];
+        path = with pkgs; [ libreswan nssTools ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = "${pkgs.libreswan}/sbin/ipsec checknss";
+        };
+      };
+
+      # `ipsec` is a shell script that shells out to all of these, and it is
+      # networkmanager that spawns it, so they have to be on *its* path.
+      systemd.services.NetworkManager.path = with pkgs; [
+        libreswan
+        iproute2
+        procps
+        nssTools
+        iptables
+        nettools
+      ];
 
       # xl2tpd's kernel-mode pppol2tp tunnel, plus mppe for servers that negotiate
       # it on top of the ipsec transport.
