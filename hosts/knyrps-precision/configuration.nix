@@ -22,6 +22,7 @@
   programs.nh.flake = "~/code/nix";
 
   features.ssh.unsafe = true;
+  features.work-vpn.profile = true;
 
   system.stateVersion = "26.05";
 }
