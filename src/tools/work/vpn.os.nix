@@ -8,10 +8,23 @@ let
   # a pre-shared key is ikev1 -- charon starts fine and then answers the
   # initiate with "IKE version 1 not supported". libreswan still implements it.
   #
+  # the gateway also only accepts 3des-sha1-modp1024, and nothing else: probing
+  # it with ike-scan shows every aes proposal and every group above 2 dropped on
+  # the floor. libreswan compiles dh2 out unless asked (ALL_ALGS defaults to
+  # false, so algparse rejects modp1024 outright), which is what left main mode
+  # retransmitting into silence.
+  libreswan = pkgs.libreswan.overrideAttrs (o: {
+    makeFlags = o.makeFlags ++ [ "USE_DH2=true" ];
+  });
+
   # the plugin picks its daemon at runtime by running the ipsec binary nixpkgs
-  # patches into it and matching the vendor string in --version, so swapping
-  # the input over is enough to move it onto libreswan wholesale.
-  plugin = pkgs.networkmanager-l2tp.override { strongswan = pkgs.libreswan; };
+  # patches into it and matching the vendor string in --version, so swapping the
+  # input over is enough to move it onto libreswan wholesale. its own dh2 switch
+  # is separate, and puts 3des-sha1-modp1024 into the default phase 1 proposals
+  # -- with it the connection needs no algorithm overrides of its own.
+  plugin = (pkgs.networkmanager-l2tp.override { strongswan = libreswan; }).overrideAttrs (o: {
+    configureFlags = o.configureFlags ++ [ "--enable-libreswan-dh2" ];
+  });
 in
 {
   options.features.work-vpn = {
@@ -62,7 +75,7 @@ in
       ];
 
       # /run/pluto and the /var/lib/ipsec/nss the database lives in
-      systemd.tmpfiles.packages = [ pkgs.libreswan ];
+      systemd.tmpfiles.packages = [ libreswan ];
 
       # pluto is started by the package unit against this file, and the per
       # connection config the plugin hands to `ipsec add` cannot override a
@@ -81,29 +94,27 @@ in
       # ipsec.service`, so the unit the package ships has to be installed or the
       # plugin dies on "Unit ipsec.service not found". no wantedBy: pluto only
       # needs to run while the vpn is up, and the plugin starts it on demand.
-      systemd.packages = [ pkgs.libreswan ];
+      systemd.packages = [ libreswan ];
 
       # the unit's ExecStartPre (checknss, checknflog) and pluto itself shell out
       # to these; the package unit carries no path of its own.
-      systemd.services.ipsec.path = with pkgs; [
-        libreswan
+      systemd.services.ipsec.path = [ libreswan ] ++ (with pkgs; [
         iproute2
         procps
         nssTools
         iptables
         nettools
-      ];
+      ]);
 
       # `ipsec` is a shell script that shells out to the same set, and it is
       # networkmanager that spawns it, so they have to be on *its* path too.
-      systemd.services.NetworkManager.path = with pkgs; [
-        libreswan
+      systemd.services.NetworkManager.path = [ libreswan ] ++ (with pkgs; [
         iproute2
         procps
         nssTools
         iptables
         nettools
-      ];
+      ]);
 
       # xl2tpd's kernel-mode pppol2tp tunnel, plus mppe for servers that negotiate
       # it on top of the ipsec transport.
