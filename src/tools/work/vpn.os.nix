@@ -151,6 +151,11 @@ in
             ipsec-enabled = "yes";
             machine-auth-type = "psk";
             ipsec-psk-flags = 0;
+
+            # libreswan proposes quick mode with pfs on, which the gateway
+            # answers with NO_PROPOSAL_CHOSEN -- windows rras does not do pfs
+            # for phase 2. phase 1 is unaffected and still comes up.
+            ipsec-pfs = "no";
           };
 
           vpn-secrets = {
