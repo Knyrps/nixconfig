@@ -52,6 +52,23 @@ in
         "d ${dirOf cfg.secretsFile} 0700 root root -"
       ];
 
+      # strongswan aborts library_init outright when /etc/strongswan.conf is
+      # missing ("no files found matching" -> "abort initialization due to
+      # invalid configuration"), and nixpkgs ships its config only as templates
+      # under share/strongswan. the starter reports that as exit code 64, which
+      # it prints as "integrity test of libstrongswan failed" -- nothing to do
+      # with integrity.
+      #
+      # the upstream template can't be used verbatim either: it sets
+      # load_modular = yes, and every plugin snippet nixpkgs installs under
+      # strongswan.d is zero-length, so charon resolves no crypto at all and
+      # dies on "unmet dependency: NONCE_GEN". an empty charon block skips
+      # modular loading and keeps the compiled-in plugin list.
+      environment.etc."strongswan.conf".text = lib.mkDefault ''
+        charon {
+        }
+      '';
+
       # xl2tpd's kernel-mode pppol2tp tunnel, plus mppe for servers that negotiate
       # it on top of the ipsec transport.
       boot.kernelModules = [ "l2tp_ppp" "ppp_mppe" ];
