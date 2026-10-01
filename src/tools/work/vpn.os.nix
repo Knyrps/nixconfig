@@ -8,6 +8,16 @@ let
   # still has it, but compiles dh2 (modp1024) out unless asked.
   libreswan = pkgs.libreswan.overrideAttrs (o: {
     makeFlags = o.makeFlags ++ [ "USE_DH2=true" ];
+
+    # 5.4 renamed the ke api to kem across ike_alg_ke.c but missed the modp1024
+    # block, which only compiles under USE_DH2 and so never reaches upstream ci.
+    # these are the three names the neighbouring modp1536 entry already uses.
+    postPatch = (o.postPatch or "") + ''
+      substituteInPlace lib/libswan/ike_alg_ke.c \
+        --replace-fail '.type = IKE_ALG_KEM,' '.type = &ike_alg_ke,' \
+        --replace-fail 'IKEv2_KEM_MODP1024' 'IKEv2_KE_MODP1024' \
+        --replace-fail '.kem_ops =' '.ke_ops ='
+    '';
   });
 
   # the plugin picks its daemon by running the ipsec binary nixpkgs patches in
