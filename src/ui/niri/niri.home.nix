@@ -115,6 +115,12 @@ lib.mkIf osConfig.features.niri.enable {
       "XF86MonBrightnessUp" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg brightness-osd "$(brightnessctl -d gmux_backlight -m set +10% | cut -d, -f4 | tr -d '%')"''; };
       "XF86MonBrightnessDown" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg brightness-osd "$(brightnessctl -d gmux_backlight -m set 10%- | cut -d, -f4 | tr -d '%')"''; };
 
+      # tiny-dfr IllumUp/IllumDown emit these. noctalia keyboard-backlight-up
+      # steps raw +1 on a 0..14660 device (invisible), so brightnessctl does the
+      # write at 10% and noctalia just draws its keyboard OSD.
+      "XF86KbdBrightnessUp" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg keyboard-backlight-osd "$(brightnessctl -d ':white:kbd_backlight' -m set +10% | cut -d, -f4 | tr -d '%')"''; };
+      "XF86KbdBrightnessDown" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg keyboard-backlight-osd "$(brightnessctl -d ':white:kbd_backlight' -m set 10%- | cut -d, -f4 | tr -d '%')"''; };
+
       "Mod+O" = { _props.repeat = false; toggle-overview = { }; };
       "Mod+Q" = { _props.repeat = false; close-window = { }; };
 

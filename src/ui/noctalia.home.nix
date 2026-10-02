@@ -8,6 +8,11 @@ lib.mkIf osConfig.features.noctalia.enable {
       # per-output geometry can no longer be persisted, see settings.toml below
       lockscreen_widgets.enabled = false;
 
+      # noctalia ranks type=.raw. above type=.platform., so on this machine it
+      # picked appletb_backlight -- the touch bar, max 2 -- as the display
+      # backlight, and the bar never tracked the screen. Pin the real panel.
+      brightness.backlight_device = "gmux_backlight";
+
       plugins = {
         enabled = [ "knyrps/nix-search" "lucasoe/proton-pass" ];
         source = [
