@@ -17,6 +17,9 @@ in
         return {
           -- WebGpu avoids blurry text under fractional scaling on wayland
           front_end = "WebGpu",
+          -- wgpu defaults to LowPower, which picks the UHD 630. The panel is
+          -- driven by the Navi 14, so that made every frame a cross-PCIe copy.
+          webgpu_power_preference = "HighPerformance",
           hide_tab_bar_if_only_one_tab = true,
           use_fancy_tab_bar = false,
           window_close_confirmation = "NeverPrompt",

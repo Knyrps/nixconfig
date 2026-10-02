@@ -45,6 +45,11 @@
     # apple-t2.enableIGPU = true;
   };
 
+  # Drives the Touch Bar function row (tiny-dfr). Its brightness keys emit the
+  # same XF86MonBrightness* events the binds above handle, so the row, the OSD
+  # and gmux_backlight all stay on one value.
+  hardware.apple.touchBar.enable = true;
+
   services.t2fanrd = {
     enable = true;
     config = {

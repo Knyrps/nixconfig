@@ -26,7 +26,17 @@ lib.mkIf osConfig.features.niri.enable {
 
     input = {
       keyboard.numlock = { };
-      touchpad.tap = { };
+
+      touchpad = {
+        tap = { };
+        natural-scroll = { };
+        dwt = { };                      # ignore the pad while typing
+        dwtp = { };                     # ... and while the trackpoint moves
+        accel-profile = "adaptive";
+        scroll-method = "two-finger";
+        click-method = "clickfinger";   # two fingers = right click, macOS style
+        accel-speed = 0.2;              # tune to taste: -1.0 (slow) .. 1.0 (fast)
+      };
     };
 
     layout = {
@@ -98,8 +108,12 @@ lib.mkIf osConfig.features.niri.enable {
       "XF86AudioStop" = { _props.allow-when-locked = true; spawn-sh = "playerctl stop"; };
       "XF86AudioPrev" = { _props.allow-when-locked = true; spawn-sh = "playerctl previous"; };
       "XF86AudioNext" = { _props.allow-when-locked = true; spawn-sh = "playerctl next"; };
-      "XF86MonBrightnessUp" = { _props.allow-when-locked = true; spawn = [ "brightnessctl" "--class=backlight" "set" "+10%" ]; };
-      "XF86MonBrightnessDown" = { _props.allow-when-locked = true; spawn = [ "brightnessctl" "--class=backlight" "set" "10%-" ]; };
+      # brightnessctl does the write: noctalia cannot map eDP-1 to gmux_backlight
+      # (it hangs off pnp0, and amdgpu skips DM backlight registration), so its
+      # own brightness-set is a silent no-op here. noctalia only draws the OSD,
+      # which keeps these keys, the touch bar row and the shell showing one value.
+      "XF86MonBrightnessUp" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg brightness-osd "$(brightnessctl -d gmux_backlight -m set +10% | cut -d, -f4 | tr -d '%')"''; };
+      "XF86MonBrightnessDown" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg brightness-osd "$(brightnessctl -d gmux_backlight -m set 10%- | cut -d, -f4 | tr -d '%')"''; };
 
       "Mod+O" = { _props.repeat = false; toggle-overview = { }; };
       "Mod+Q" = { _props.repeat = false; close-window = { }; };
