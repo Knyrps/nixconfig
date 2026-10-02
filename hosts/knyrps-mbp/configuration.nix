@@ -18,12 +18,6 @@
     kernelParams = [
       "hid_apple.swap_opt_cmd=1"
       "hid_apple.swap_fn_leftctrl=1"
-
-      # The panel's EDID advertises only its native 3072x1920, which the UHD 630
-      # struggles to drive (the dGPU is switched off below). Force a CVT-timed
-      # 1920x1200 into the mode list; i915's pipe scaler upscales it to the
-      # panel's fixed timing.
-      "video=eDP-1:1920x1200@60"
     ];
   };
 
@@ -44,7 +38,11 @@
       }))
     ];
 
-    apple-t2.enableIGPU = true;
+    # Left at the default (false). Setting it true writes
+    # "options apple-gmux force_igd=y", which muxes the internal panel to the
+    # UHD 630 -- amdgpu then cannot reach the panel's DDC lines to read its
+    # EDID, so the Navi 14 sits idle while the iGPU struggles with 3072x1920.
+    # apple-t2.enableIGPU = true;
   };
 
   services.t2fanrd = {
@@ -52,26 +50,6 @@
     config = {
       Fan1 = { low_temp = 50; high_temp = 75; speed_curve = "exponential"; };
       Fan2 = { low_temp = 50; high_temp = 75; speed_curve = "exponential"; };
-    };
-  };
-
-  systemd.services.amdgpu-off = {
-    description = "Power off the AMD dGPU via vgaswitcheroo";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "systemd-modules-load.service" ];
-    before = [ "display-manager.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = pkgs.writeShellScript "amdgpu-off" ''
-        for i in $(seq 1 30); do
-          if [ -e /sys/kernel/debug/vgaswitcheroo/switch ]; then
-            echo OFF > /sys/kernel/debug/vgaswitcheroo/switch
-            exit 0
-          fi
-          sleep 1
-        done
-        exit 1
-      '';
     };
   };
 
