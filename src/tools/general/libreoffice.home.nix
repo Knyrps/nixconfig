@@ -13,7 +13,7 @@ in
     # the libreoffice wrapper picks dictionaries up from share/hunspell and
     # share/hyphen in every profile, so installing them alongside is enough
     home.packages = with pkgs; [
-      libreoffice-fresh
+      libreoffice
       hunspellDicts.de_DE
       hunspellDicts.en_US
       hyphenDicts.de_DE
