@@ -4,7 +4,15 @@ let
   cfg = config.features.firefox;
   has = osConfig.host.has;
   addons = pkgs.nur.repos.rycee.firefox-addons;
-  common = with addons; [ ublock-origin ipvfoo ];
+  volume-master = addons.buildFirefoxXpiAddon {
+    pname = "volume-master";
+    version = "1.0.1";
+    addonId = "volume_master@outlook.com";
+    url = "https://addons.mozilla.org/firefox/downloads/file/4732900/volume_master_up-1.0.1.xpi";
+    sha256 = "sha256-F6/TeRS7T8FtVDQV26x3n1P55ZsvoUP7AadwFnAhS/g=";
+    meta = { };
+  };
+  common = with addons; [ ublock-origin ipvfoo volume-master ];
 
   keybindings = pkgs.writeText "firefox-keybindings.cfg" ''
     (function () {
