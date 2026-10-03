@@ -29,7 +29,6 @@ lib.mkIf osConfig.features.niri.enable {
 
       touchpad = {
         tap = { };
-        natural-scroll = { };
         dwt = { };                      # ignore the pad while typing
         dwtp = { };                     # ... and while the trackpoint moves
         accel-profile = "adaptive";
