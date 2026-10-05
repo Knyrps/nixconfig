@@ -1,5 +1,9 @@
 { osConfig, lib, ... }:
 
+let
+  p = osConfig.theme.palette.dark;
+  c = osConfig.theme.lib;
+in
 lib.mkIf osConfig.features.niri.enable {
   wayland.windowManager.niri.enable = true;
 
