@@ -9,7 +9,7 @@
     useWindowsDriver = true;
   };
 
-  host.roles = [ "ui" "coding" ];
+  host.roles = [ "ui" "coding" "personal" ];
 
   features = {
     noctalia.greeter = false;
