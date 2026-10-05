@@ -59,7 +59,9 @@ lib.mkIf osConfig.features.noctalia.enable {
           ++ lib.optional config.features.firefox.enable "pywalfox"
           ++ lib.optional config.features.libreoffice.enable "libreoffice"
           ++ lib.optional config.features.thunderbird.enable "thunderbird"
-          ++ lib.optional config.features.prism-launcher.enable "prismlauncher";
+          ++ lib.optional config.features.prism-launcher.enable "prismlauncher"
+          ++ lib.optional osConfig.features.steam.enable "steam"
+          ++ lib.optional config.features.claude-code.enable "claude-code";
       };
 
       wallpaper = {
