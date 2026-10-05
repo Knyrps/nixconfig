@@ -81,7 +81,7 @@ lib.mkIf osConfig.features.niri.enable {
       "Mod+T" = { _props.hotkey-overlay-title = "Open a Terminal: wezterm"; spawn = "wezterm"; };
       "Mod+D" = { _props.hotkey-overlay-title = "Run an Application: fuzzel"; spawn = "fuzzel"; };
       "Mod+E".spawn-sh = "nautilus ~/";
-      "Super+Alt+L" = { _props.hotkey-overlay-title = "Lock the Screen: swaylock"; spawn = "swaylock"; };
+      "Super+Alt+L" = { _props.hotkey-overlay-title = "Lock the Screen"; spawn = [ "noctalia" "msg" "session" "lock" ]; };
       "Super+Alt+S" = {
         _props = { allow-when-locked = true; hotkey-overlay-title = null; };
         spawn-sh = "pkill orca || exec orca";

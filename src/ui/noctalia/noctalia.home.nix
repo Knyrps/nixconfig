@@ -35,6 +35,11 @@ lib.mkIf osConfig.features.noctalia.enable {
 
       shell.font_family = "Inter";
 
+      idle.behavior = {
+        lock = { timeout = 600; action = "lock"; enabled = true; };
+        "screen-off" = { timeout = 660; action = "screen_off"; enabled = true; };
+      };
+
       shell.screenshot = {
         annotate = true;
         directory = "~/Pictures/Screenshots";
