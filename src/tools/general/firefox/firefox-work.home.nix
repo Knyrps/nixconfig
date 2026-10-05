@@ -39,7 +39,7 @@ in
 
       profiles.work = {
         id = 1;
-        isDefault = !config.features.firefox-personal.enable;
+        isDefault = false;
         settings = fx.sharedSettings // {
           "browser.startup.homepage" = "https://myapps.microsoft.com";
           "browser.startup.page" = 1;

@@ -194,6 +194,16 @@ in
 
         ExtensionSettings = { "*".installation_mode = "blocked"; } // config.lib.firefox.allow common;
       };
+
+      profiles.default = {
+        id = 0;
+        isDefault = true;
+        settings = config.lib.firefox.sharedSettings;
+        extensions = {
+          force = true;
+          packages = lib.mkDefault common;
+        };
+      };
     };
   };
 }
