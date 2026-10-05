@@ -5,8 +5,8 @@ let
   p = osConfig.theme.palette.dark;
   c = osConfig.theme.lib;
   themed = c.recolor {
-    "#0077c2" = p.tertiary;
-    "#ffffff" = p.on_tertiary;
+    "#0077c2" = p.surface_variant;
+    "#ffffff" = p.on_surface;
     "#fffb38" = p.secondary;
     "#011627" = p.on_secondary;
     "#ff9248" = p.primary;
@@ -20,7 +20,7 @@ let
     "#83769c" = p.surface_variant;
     "#565656" = p.hover;
     "#0e0e0e" = p.surface;
-    "#00897b" = p.secondary;
+    "#00897b" = p.hover;
     "#21c7c7" = p.primary;
     "#e0f8ff" = p.on_surface;
   } (c.fromJsonFile ./oh-my-posh.omp.json);
