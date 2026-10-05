@@ -13,6 +13,14 @@ lib.mkIf osConfig.features.niri.enable {
     _children = [
       {
         window-rule = {
+          match._props.app-id = "dev.noctalia.Noctalia";
+          open-floating = true;
+          default-column-width.fixed = 1080;
+          default-window-height.fixed = 920;
+        };
+      }
+      {
+        window-rule = {
           match._props = { app-id = "firefox$"; title = "^Picture-in-Picture$"; };
           open-floating = true;
         };
