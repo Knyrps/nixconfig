@@ -29,14 +29,20 @@ lib.mkIf osConfig.features.noctalia.enable {
       };
 
       theme = {
-        source = "builtin";
-        builtin = "Noctalia";
+        source = "custom";
+        custom_palette = "street";
         mode = "dark";
       };
 
-      wallpaper.default.path = "${config.programs.noctalia.package}/share/noctalia/assets/noctalia-wallpaper.png";
+      wallpaper = {
+        fill_mode = "center";
+        fill_color = "#191919";
+        default.path = "${../../../assets/wallpapers/street.png}";
+      };
     };
   };
+
+  xdg.configFile."noctalia/palettes/street.json".source = ./street.json;
 
   # noctalia's state layer outranks ~/.config/noctalia, so gui and `noctalia msg`
   # changes would silently shadow everything above. an empty store symlink makes
