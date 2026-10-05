@@ -40,7 +40,7 @@ in
           window_padding = { left = 8, right = 8, top = 8, bottom = 8 },
 
           keys = {
-            -- free ctrl+r so it reaches atuin in the shell. wezterm registers
+            -- free ctrl+r so it reaches fzf in the shell. wezterm registers
             -- reload under several normalisations of r/R, so unbind them all
             -- and move reload to ctrl+F5 (super+r keeps working too).
             { key = "r", mods = "CTRL",       action = wezterm.action.DisableDefaultAssignment },
