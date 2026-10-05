@@ -1,4 +1,4 @@
-{ osConfig, config, lib, pkgs, ... }:
+{ osConfig, config, lib, ... }:
 
 let
   cfg = config.features.vesktop;
@@ -10,6 +10,9 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ pkgs.vesktop ];
+    programs.vesktop = {
+      enable = true;
+      vencord.settings.enabledThemes = [ "noctalia.theme.css" ];
+    };
   };
 }

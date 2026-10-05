@@ -12,7 +12,7 @@ let
     sha256 = "sha256-F6/TeRS7T8FtVDQV26x3n1P55ZsvoUP7AadwFnAhS/g=";
     meta = { };
   };
-  common = with addons; [ ublock-origin ipvfoo volume-master ];
+  common = with addons; [ ublock-origin ipvfoo volume-master pywalfox ];
 
   keybindings = pkgs.writeText "firefox-keybindings.cfg" ''
     (function () {

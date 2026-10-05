@@ -54,6 +54,12 @@ lib.mkIf osConfig.features.noctalia.enable {
         custom_palette = t.name;
         mode = "dark";
         templates.builtin_ids = [ "gtk3" "gtk4" ];
+        templates.community_ids =
+          lib.optional config.features.vesktop.enable "discord"
+          ++ lib.optional config.features.firefox.enable "pywalfox"
+          ++ lib.optional config.features.libreoffice.enable "libreoffice"
+          ++ lib.optional config.features.thunderbird.enable "thunderbird"
+          ++ lib.optional config.features.prism-launcher.enable "prismlauncher";
       };
 
       wallpaper = {
