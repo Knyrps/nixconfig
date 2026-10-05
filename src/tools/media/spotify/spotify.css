@@ -41,12 +41,6 @@
   color: var(--spice-main) !important;
 }
 
-/* comfy leaves the progress track transparent, so early in a song the
-   bar is invisible. */
-:root .playback-progressbar .x-progressBar-progressBarBg {
-  background-color: color-mix(in srgb, var(--spice-text) 15%, transparent) !important;
-}
-
 /* comfy pulls the play button 24px up to overlap the old banner edge; in
    the centred action bar row that leaves it 12px above its siblings. */
 :root .main-actionBar-ActionBar .main-playButton-PlayButton {
