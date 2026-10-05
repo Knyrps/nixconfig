@@ -22,6 +22,17 @@ lib.mkIf osConfig.features.noctalia.enable {
         ];
       };
 
+      bar.default = {
+        position = "top";
+        margin_ends = 0;
+        margin_edge = 0;
+        radius = 0;
+        shadow = false;
+        start = [ "workspaces" ];
+        center = [ "clock" ];
+        end = [ "media" "tray" "notifications" "clipboard" "network" "bluetooth" "volume" "brightness" "battery" "control-center" "session" ];
+      };
+
       shell.screenshot = {
         annotate = true;
         directory = "~/Pictures/Screenshots";
