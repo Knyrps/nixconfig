@@ -17,6 +17,7 @@ in
         contrast = builtins.readFile ./contrast.css;
         accents = builtins.readFile ./accents.css;
         quests = builtins.readFile ./quests.css;
+        window-controls = builtins.readFile ./window-controls.css;
       };
     };
   };
