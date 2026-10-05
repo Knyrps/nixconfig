@@ -10,6 +10,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    home.packages = [ pkgs.file-roller ];
+
     # right-click -> Scripts -> Copy Path
     home.file."${config.xdg.dataHome}/nautilus/scripts/Copy Path" = {
       executable = true;
