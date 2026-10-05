@@ -22,6 +22,7 @@ let
   documents = [ "application/msword" "application/vnd.openxmlformats-officedocument.wordprocessingml.document" "application/vnd.oasis.opendocument.text" "application/rtf" "text/rtf" ];
   sheets = [ "application/vnd.ms-excel" "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" "application/vnd.oasis.opendocument.spreadsheet" ];
   slides = [ "application/vnd.ms-powerpoint" "application/vnd.openxmlformats-officedocument.presentationml.presentation" "application/vnd.oasis.opendocument.presentation" ];
+  mail = [ "x-scheme-handler/mailto" "message/rfc822" "text/calendar" "x-scheme-handler/net.thunderbird" ];
   drawings = [ "application/vnd.oasis.opendocument.graphics" "application/vnd.visio" ];
 in
 {
@@ -47,7 +48,7 @@ in
       // lib.optionalAttrs config.features.celluloid.enable (lib.genAttrs (video ++ audio) (_: celluloid))
       // lib.optionalAttrs config.features.libreoffice.enable (lib.genAttrs documents (_: writer) // lib.genAttrs sheets (_: calc) // lib.genAttrs slides (_: impress) // lib.genAttrs drawings (_: draw))
       // lib.optionalAttrs config.features.zed.enable (lib.genAttrs text (_: zed))
-      // lib.optionalAttrs config.features.thunderbird.enable { "x-scheme-handler/mailto" = thunderbird; };
+      // lib.optionalAttrs config.features.thunderbird.enable (lib.genAttrs mail (_: thunderbird));
     };
   };
 }
