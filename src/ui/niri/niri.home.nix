@@ -101,9 +101,9 @@ lib.mkIf osConfig.features.niri.enable {
         spawn = "pick-color";
       };
 
-      "XF86AudioRaiseVolume" = { _props.allow-when-locked = true; spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0"; };
-      "XF86AudioLowerVolume" = { _props.allow-when-locked = true; spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-"; };
-      "XF86AudioMute" = { _props.allow-when-locked = true; spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; };
+      "XF86AudioRaiseVolume" = { _props.allow-when-locked = true; spawn-sh = "noctalia msg volume-up"; };
+      "XF86AudioLowerVolume" = { _props.allow-when-locked = true; spawn-sh = "noctalia msg volume-down"; };
+      "XF86AudioMute" = { _props.allow-when-locked = true; spawn-sh = "noctalia msg volume-mute"; };
       "XF86AudioMicMute" = { _props.allow-when-locked = true; spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; };
       "XF86AudioPlay" = { _props.allow-when-locked = true; spawn-sh = "playerctl play-pause"; };
       "XF86AudioStop" = { _props.allow-when-locked = true; spawn-sh = "playerctl stop"; };
