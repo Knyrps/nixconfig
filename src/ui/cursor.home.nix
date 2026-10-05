@@ -1,4 +1,4 @@
-{ osConfig, config, lib, pkgs, ... }:
+{ osConfig, config, lib, ... }:
 
 let
   cfg = config.features.cursor;
@@ -12,11 +12,7 @@ in
   config = lib.mkIf cfg.enable {
     home.pointerCursor = {
       enable = true;
-
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Amber";
-      size = 18;
-
+      inherit (osConfig.theme.cursor) name package size;
       x11.enable = true;
       gtk.enable = true;
     };
