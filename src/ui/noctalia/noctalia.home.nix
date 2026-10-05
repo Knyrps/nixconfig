@@ -45,6 +45,7 @@ lib.mkIf osConfig.features.noctalia.enable {
         source = "custom";
         custom_palette = "street";
         mode = "dark";
+        templates.builtin_ids = [ "gtk3" "gtk4" ];
       };
 
       wallpaper = {
