@@ -8,9 +8,17 @@ lib.mkIf osConfig.features.niri.enable {
 
     prefer-no-csd = true;
 
+    overview.workspace-shadow.off = { };
+
     debug.honor-xdg-activation-with-invalid-serial = { };
 
     _children = [
+      {
+        layer-rule = {
+          match._props.namespace = "^noctalia-wallpaper";
+          place-within-backdrop = true;
+        };
+      }
       {
         window-rule = {
           match._props.app-id = "dev.noctalia.Noctalia";
@@ -50,6 +58,7 @@ lib.mkIf osConfig.features.niri.enable {
 
     layout = {
       gaps = 16;
+      background-color = "transparent";
       center-focused-column = "never";
 
       preset-column-widths._children = [
