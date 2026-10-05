@@ -63,12 +63,13 @@ in
 
     programs.fish = lib.mkIf config.features.atuin.enable {
       functions.__fzf_atuin_history = ''
+        set -l width (math (tput cols) - 24)
         set -l selection (
           atuin history list --human --print0 --format '{exit}'\t'{duration}'\t'{command}' 2>/dev/null \
-          | awk 'BEGIN { RS = "\0"; ORS = "\0"; FS = "\t"; OFS = "\t" } !seen[$3]++ { if ($1 == "0") $1 = "\033[32m\xe2\x9c\x93 \033[0m"; else $1 = "\033[31m\xe2\x9c\x97 " $1 "\033[0m"; $2 = sprintf("\033[2m%-6s\033[0m", $2); print }' \
-          | fzf --read0 --ansi --no-sort --exact --layout=default --delimiter \t --with-nth 1,2,3 --nth 3 --query (commandline -b) --input-label ' History '
+          | awk -v w=$width 'BEGIN { RS = "\0"; ORS = "\0"; FS = "\t" } !seen[$3]++ { status = ($1 == "0") ? "\033[32m\xe2\x9c\x93\033[0m" : "\033[31m\xe2\x9c\x97\033[0m"; print sprintf("%-*s\t %s \t\033[2m%8s\033[0m", w, $3, status, $2) }' \
+          | fzf --read0 --ansi --no-sort --exact --layout=default --delimiter \t --with-nth 1,2,3 --nth 1 --query (commandline -b) --input-label ' History '
         )
-        and commandline -r -- (string split -m 2 \t $selection)[3]
+        and commandline -r -- (string trim --right -- (string split -m 2 \t $selection)[1])
         commandline -f repaint
       '';
 
