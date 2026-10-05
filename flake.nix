@@ -27,6 +27,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:soopyc/nixos-hardware/apple-t2-updates";
+    spicetify-nix = {
+      url = "github:Gerg-L/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    millennium.url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
+    material-theme = {
+      url = "github:kuska1/Material-Theme";
+      flake = false;
+    };
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
       inputs.nixpkgs.follows = "nixpkgs";

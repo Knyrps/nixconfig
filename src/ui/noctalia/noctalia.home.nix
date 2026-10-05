@@ -1,5 +1,8 @@
 { osConfig, config, lib, ... }:
 
+let
+  t = osConfig.theme;
+in
 lib.mkIf osConfig.features.noctalia.enable {
   programs.noctalia = {
     enable = true;
@@ -33,7 +36,7 @@ lib.mkIf osConfig.features.noctalia.enable {
         end = [ "media" "tray" "notifications" "clipboard" "network" "bluetooth" "volume" "brightness" "battery" "control-center" "session" ];
       };
 
-      shell.font_family = "Inter";
+      shell.font_family = t.fonts.sans.name;
 
       idle.behavior = {
         lock = { timeout = 600; action = "lock"; enabled = true; };
@@ -48,20 +51,28 @@ lib.mkIf osConfig.features.noctalia.enable {
 
       theme = {
         source = "custom";
-        custom_palette = "street";
+        custom_palette = t.name;
         mode = "dark";
         templates.builtin_ids = [ "gtk3" "gtk4" ];
+        templates.community_ids =
+          lib.optional config.features.vesktop.enable "discord"
+          ++ lib.optional config.features.firefox.enable "pywalfox"
+          ++ lib.optional config.features.libreoffice.enable "libreoffice"
+          ++ lib.optional config.features.thunderbird.enable "thunderbird"
+          ++ lib.optional config.features.prism-launcher.enable "prismlauncher"
+          ++ lib.optional osConfig.features.steam.enable "steam"
+          ++ lib.optional config.features.claude-code.enable "claude-code";
       };
 
       wallpaper = {
-        fill_mode = "center";
-        fill_color = "#191919";
-        default.path = "${../../../assets/wallpapers/street.png}";
+        fill_mode = t.wallpaper.fill;
+        fill_color = t.wallpaper.fill_color;
+        default.path = "${t.wallpaper.path}";
       };
     };
   };
 
-  xdg.configFile."noctalia/palettes/street.json".source = ./street.json;
+  xdg.configFile."noctalia/palettes/${t.name}.json".text = builtins.toJSON (lib.mapAttrs (_: t.lib.noctalia) t.palette);
 
   # noctalia's state layer outranks ~/.config/noctalia, so gui and `noctalia msg`
   # changes would silently shadow everything above. an empty store symlink makes

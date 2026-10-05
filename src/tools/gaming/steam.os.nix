@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 let
   cfg = config.features.steam;
@@ -10,8 +10,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    nixpkgs.overlays = [ inputs.millennium.overlays.default ];
+
     programs.steam = {
       enable = true;
+      package = pkgs.millennium-steam;
       remotePlay.openFirewall = true;
       dedicatedServer.openFirewall = true;
       localNetworkGameTransfers.openFirewall = true;
