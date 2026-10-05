@@ -33,6 +33,8 @@ lib.mkIf osConfig.features.noctalia.enable {
         end = [ "media" "tray" "notifications" "clipboard" "network" "bluetooth" "volume" "brightness" "battery" "control-center" "session" ];
       };
 
+      shell.font_family = "Inter";
+
       shell.screenshot = {
         annotate = true;
         directory = "~/Pictures/Screenshots";
