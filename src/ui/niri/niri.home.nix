@@ -8,6 +8,8 @@ lib.mkIf osConfig.features.niri.enable {
 
     prefer-no-csd = true;
 
+    debug.honor-xdg-activation-with-invalid-serial = { };
+
     _children = [
       {
         window-rule = {
