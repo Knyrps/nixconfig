@@ -42,8 +42,9 @@
 }
 
 /* comfy pulls the play button 24px up to overlap the old banner edge; in
-   the centred action bar row that leaves it 12px above its siblings. */
-:root .main-actionBar-ActionBar .main-playButton-PlayButton {
+   the centred action bar row that leaves it 12px above its siblings.
+   the margin sits on the button's container, not the button itself. */
+:root .main-actionBar-ActionBar .main-actionBar-ActionBarPlayButtonContainer {
   margin-top: 0 !important;
 }
 
@@ -51,4 +52,12 @@
    at 60%, leaving a visible step where they meet. */
 :root .main-actionBarBackground-background {
   background-image: linear-gradient(rgba(0, 0, 0, 0.5) 0%, var(--spice-main) 100%), var(--tracklist-gradient-noise) !important;
+}
+
+/* comfy centres the header's contentSpacing div and stops the title from
+   growing, written for when cover and title sat directly in the container.
+   spotify now wraps both in contentWrapper.contentSpacing, so the pair is
+   centred instead, shifting the cover right by however short the title is. */
+:root .main-entityHeader-container .main-entityHeader-contentWrapper {
+  justify-content: flex-start !important;
 }
