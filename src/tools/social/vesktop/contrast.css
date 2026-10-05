@@ -1,7 +1,4 @@
-/* noctalia's discord template feeds outline/outline_variant into midnight's
-   --text-4/--text-5 (--text-subtle/--text-muted), which are border colours
-   and unreadable as text. derive them from --text-3 instead so they keep
-   following the palette. :root:root outranks the template's :root. */
+/* readable subtle and muted text */
 :root:root {
   --text-4: var(--text-3);
   --text-5: color-mix(in srgb, var(--text-3) 85%, var(--bg-4));

@@ -25,8 +25,7 @@ in
       executable = true;
       text = ''
         #!${pkgs.runtimeShell}
-        # nautilus hands us the selection newline-separated; fall back to the
-        # folder being viewed when nothing is selected
+        # selection, else current folder
         paths="$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS"
         if [ -z "$paths" ]; then
           paths="''${NAUTILUS_SCRIPT_CURRENT_URI#file://}"

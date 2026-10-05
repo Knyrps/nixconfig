@@ -14,6 +14,8 @@ in
     programs.fish = {
       enable = true;
       interactiveShellInit = ''
+        set fish_greeting
+
         set fish_color_normal ${s p.on_surface}
         set fish_color_command ${s p.terminal.normal.green}
         set fish_color_keyword ${s p.terminal.normal.magenta}

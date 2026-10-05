@@ -4,14 +4,11 @@ let
   cfg = config.features.work-vpn;
   has = config.host.has;
 
-  # strongswan 6 dropped ikev1, which l2tp/ipsec with a psk needs. libreswan
-  # still has it, but compiles dh2 (modp1024) out unless asked.
+  # ikev1 + dh2 for l2tp psk
   libreswan = pkgs.libreswan.overrideAttrs (o: {
     makeFlags = o.makeFlags ++ [ "USE_DH2=true" ];
 
-    # 5.4 renamed the ke api to kem across ike_alg_ke.c but missed the modp1024
-    # block, which only compiles under USE_DH2 and so never reaches upstream ci.
-    # these are the three names the neighbouring modp1536 entry already uses.
+    # upstream missed renaming the dh2 block
     postPatch = (o.postPatch or "") + ''
       substituteInPlace lib/libswan/ike_alg_ke.c \
         --replace-fail '.type = IKE_ALG_KEM,' '.type = &ike_alg_ke,' \
@@ -20,9 +17,7 @@ let
     '';
   });
 
-  # the plugin picks its daemon by running the ipsec binary nixpkgs patches in
-  # and matching --version, so overriding the input is enough. its own dh2
-  # switch adds modp1024 to the default phase 1 proposals.
+  # plugin detects libreswan via ipsec --version
   plugin = (pkgs.networkmanager-l2tp.override { strongswan = libreswan; }).overrideAttrs (o: {
     configureFlags = o.configureFlags ++ [ "--enable-libreswan-dh2" ];
   });
@@ -51,19 +46,17 @@ in
       networking.networkmanager.plugins = [ plugin ];
 
       systemd.tmpfiles.rules = [
-        # the plugin writes the psk here but never creates the directory
+        # plugin never creates it
         "d /etc/ipsec.d 0700 root root -"
 
-        # not gated on profile: the secrets file has to exist before the profile
-        # does, or activation trips over the missing EnvironmentFile
+        # must exist before the profile
         "d ${dirOf cfg.secretsFile} 0700 root root -"
       ];
 
       # /run/pluto and /var/lib/ipsec/nss
       systemd.tmpfiles.packages = [ libreswan ];
 
-      # pluto reads this, and a per-connection config cannot override a global.
-      # libreswan 5 defaults to ikev1-policy=drop, which refuses ikev1 at load.
+      # libreswan 5 drops ikev1 by default
       environment.etc."ipsec.conf".text = lib.mkDefault ''
         config setup
           ikev1-policy=accept
@@ -71,11 +64,10 @@ in
         include /etc/ipsec.d/*.conf
       '';
 
-      # `ipsec start` defers to `systemctl start ipsec.service`. no wantedBy:
-      # the plugin starts it on demand.
+      # started on demand
       systemd.packages = [ libreswan ];
 
-      # `ipsec` is a shell script; these are what it and pluto shell out to.
+      # what ipsec shells out to
       systemd.services.ipsec.path = [ libreswan ] ++ (with pkgs; [
         iproute2
         procps
@@ -84,7 +76,7 @@ in
         nettools
       ]);
 
-      # networkmanager is what spawns `ipsec`, so it needs the same set
+      # nm spawns ipsec
       systemd.services.NetworkManager.path = [ libreswan ] ++ (with pkgs; [
         iproute2
         procps
@@ -93,11 +85,10 @@ in
         nettools
       ]);
 
-      # xl2tpd's kernel-mode pppol2tp tunnel, plus mppe if the server asks
+      # l2tp tunnel, mppe
       boot.kernelModules = [ "l2tp_ppp" "ppp_mppe" ];
 
-      # the l2tp plugin's vpn dialog is a gtk editor nm-connection-editor loads;
-      # noctalia's network panel only does wifi
+      # gtk vpn editor
       environment.systemPackages = lib.optional (has "ui") pkgs.networkmanagerapplet;
     }
 
@@ -105,8 +96,6 @@ in
       networking.networkmanager.ensureProfiles = {
         environmentFiles = [ cfg.secretsFile ];
 
-        # envsubst runs over this on activation. the result lands in
-        # /run/NetworkManager/system-connections, read-only to the gui.
         profiles.work-vpn = {
           connection = {
             id = "work";
@@ -126,11 +115,10 @@ in
             machine-auth-type = "psk";
             ipsec-psk-flags = 0;
 
-            # quick mode with pfs gets NO_PROPOSAL_CHOSEN
+            # pfs gets NO_PROPOSAL_CHOSEN
             ipsec-pfs = "no";
 
-            # nat traversal does not work for l2tp from behind a nat while the
-            # source port is 1701
+            # nat-t fails on port 1701
             ephemeral-port = "yes";
           };
 

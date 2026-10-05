@@ -6,7 +6,7 @@ let
 
   offload = osConfig.hardware.nvidia.prime.offload.enable or false;
 
-  # Offload Minecraft (LWJGL) to the iGPU via PRIME offload variables.
+  # prime offload
   package =
     if offload then
       pkgs.symlinkJoin {

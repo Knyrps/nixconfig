@@ -11,15 +11,13 @@
 
   boot.initrd.luks.devices."luks-81d4d08c-ebe4-4b8a-bd88-c8f664e37a4d".device = "/dev/disk/by-uuid/81d4d08c-ebe4-4b8a-bd88-c8f664e37a4d";
 
-  # Load i915 early so its audio component is ready before snd_hda_intel probes.
-  # Otherwise the ALC289 codec intermittently loses the race and the kernel
-  # disables it ("hdaudioC4D0: Unable to configure, disabling"), leaving the
-  # internal card with only its HDMI codec and no analog sink or source.
+  # before snd_hda_intel, else codec is lost
   boot.initrd.kernelModules = [ "i915" ];
 
-  host.roles = [ "ui" "laptop" "ssh" "bluetooth" "networkmanager" "personal" "work" "coding" "gaming" ];
+  host.roles = [ "ui" "laptop" "ssh" "bluetooth" "networkmanager" "personal" "work" "coding" "gaming" "multimedia" ];
 
-  programs.nh.flake = "~/code/nix";
+  # stream deck udev rules
+  programs.streamcontroller.enable = true;
 
   features.ssh.unsafe = true;
   features.work-vpn.profile = true;

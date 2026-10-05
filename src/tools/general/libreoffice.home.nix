@@ -10,8 +10,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # the libreoffice wrapper picks dictionaries up from share/hunspell and
-    # share/hyphen in every profile, so installing them alongside is enough
+    # wrapper finds them in the profile
     home.packages = with pkgs; [
       libreoffice
       hunspellDicts.de_DE

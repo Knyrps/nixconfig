@@ -14,8 +14,7 @@ lib.mkIf osConfig.features.niri.enable {
 
     overview.workspace-shadow.off = { };
 
-    # noctalia provides the window switcher; drop niri's, whose default
-    # Alt+Shift+Tab bind would otherwise still win.
+    # noctalia owns the switcher
     recent-windows.off = { };
 
     debug.honor-xdg-activation-with-invalid-serial = { };
@@ -61,12 +60,12 @@ lib.mkIf osConfig.features.niri.enable {
 
       touchpad = {
         tap = { };
-        dwt = { };                      # ignore the pad while typing
+        dwt = { };                      # ignore pad while typing
         dwtp = { };                     # ... and while the trackpoint moves
         accel-profile = "adaptive";
         scroll-method = "two-finger";
-        click-method = "clickfinger";   # two fingers = right click, macOS style
-        accel-speed = 0.2;              # tune to taste: -1.0 (slow) .. 1.0 (fast)
+        click-method = "clickfinger";   # two-finger right click
+        accel-speed = 0.2;              # -1.0 to 1.0
       };
     };
 
@@ -114,7 +113,7 @@ lib.mkIf osConfig.features.niri.enable {
       "Mod+T" = { _props.hotkey-overlay-title = "Open a Terminal: wezterm"; spawn = "wezterm"; };
       "Mod+D" = { _props.hotkey-overlay-title = "Run an Application: fuzzel"; spawn = "fuzzel"; };
       "Alt+Tab" = { _props.hotkey-overlay-title = "Switch Windows"; spawn-sh = "noctalia msg window-switcher hold"; };
-      # no reverse ipc action; once open, shift+tab cycles backwards.
+      # shift+tab cycles back
       "Alt+Shift+Tab" = { _props.hotkey-overlay-title = null; spawn-sh = "noctalia msg window-switcher hold"; };
       "Mod+E".spawn-sh = "nautilus ~/";
       "Super+Alt+L" = { _props.hotkey-overlay-title = "Lock the Screen"; spawn = [ "noctalia" "msg" "session" "lock" ]; };
@@ -143,16 +142,11 @@ lib.mkIf osConfig.features.niri.enable {
       "XF86AudioStop" = { _props.allow-when-locked = true; spawn-sh = "playerctl stop"; };
       "XF86AudioPrev" = { _props.allow-when-locked = true; spawn-sh = "playerctl previous"; };
       "XF86AudioNext" = { _props.allow-when-locked = true; spawn-sh = "playerctl next"; };
-      # brightnessctl does the write: noctalia cannot map eDP-1 to gmux_backlight
-      # (it hangs off pnp0, and amdgpu skips DM backlight registration), so its
-      # own brightness-set is a silent no-op here. noctalia only draws the OSD,
-      # which keeps these keys, the touch bar row and the shell showing one value.
+      # noctalia can't write gmux_backlight
       "XF86MonBrightnessUp" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg brightness-osd "$(brightnessctl -d gmux_backlight -m set +10% | cut -d, -f4 | tr -d '%')"''; };
       "XF86MonBrightnessDown" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg brightness-osd "$(brightnessctl -d gmux_backlight -m set 10%- | cut -d, -f4 | tr -d '%')"''; };
 
-      # tiny-dfr IllumUp/IllumDown emit these. noctalia keyboard-backlight-up
-      # steps raw +1 on a 0..14660 device (invisible), so brightnessctl does the
-      # write at 10% and noctalia just draws its keyboard OSD.
+      # noctalia steps too finely
       "XF86KbdBrightnessUp" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg keyboard-backlight-osd "$(brightnessctl -d ':white:kbd_backlight' -m set +10% | cut -d, -f4 | tr -d '%')"''; };
       "XF86KbdBrightnessDown" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg keyboard-backlight-osd "$(brightnessctl -d ':white:kbd_backlight' -m set 10%- | cut -d, -f4 | tr -d '%')"''; };
 

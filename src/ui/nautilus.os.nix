@@ -12,7 +12,7 @@ in
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [ pkgs.nautilus ];
 
-    # trash, mounts and network locations; nautilus is badly degraded without it
+    # trash and mounts
     services.gvfs.enable = true;
 
     services.gnome.sushi.enable = true;

@@ -9,6 +9,9 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    programs.nh.enable = true;
+    programs.nh = {
+      enable = true;
+      flake = "${config.home.homeDirectory}/cfg/nix";
+    };
   };
 }

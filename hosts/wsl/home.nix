@@ -1,8 +1,6 @@
 { ... }:
 
 {
-  features.davinci-resolve.enable = false;
-
   wayland.windowManager.niri.settings = {
     _children = [
       { spawn-at-startup._args = [ "noctalia" ]; }

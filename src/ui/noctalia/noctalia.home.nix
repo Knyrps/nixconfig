@@ -8,12 +8,10 @@ lib.mkIf osConfig.features.noctalia.enable {
     enable = true;
     systemd.enable = true;
     settings = {
-      # per-output geometry can no longer be persisted, see settings.toml below
+      # geometry can't persist
       lockscreen_widgets.enabled = false;
 
-      # noctalia ranks type=.raw. above type=.platform., so on this machine it
-      # picked appletb_backlight -- the touch bar, max 2 -- as the display
-      # backlight, and the bar never tracked the screen. Pin the real panel.
+      # the panel, not the touch bar
       brightness.backlight_device = "gmux_backlight";
 
       plugins = {
@@ -21,7 +19,6 @@ lib.mkIf osConfig.features.noctalia.enable {
         source = [
           { name = "official"; kind = "git"; location = "https://github.com/noctalia-dev/official-plugins"; }
           { name = "community"; kind = "git"; location = "https://github.com/noctalia-dev/community-plugins"; }
-          # { name = "dev"; kind = "path"; location = "/home/knyrps/code/noctalia/local-plugins/"; }
         ];
       };
 
@@ -74,9 +71,6 @@ lib.mkIf osConfig.features.noctalia.enable {
 
   xdg.configFile."noctalia/palettes/${t.name}.json".text = builtins.toJSON (lib.mapAttrs (_: t.lib.noctalia) t.palette);
 
-  # noctalia's state layer outranks ~/.config/noctalia, so gui and `noctalia msg`
-  # changes would silently shadow everything above. an empty store symlink makes
-  # it unwritable: noctalia logs one warning per attempt and keeps the declared
-  # value. previous contents land in settings.toml.hm-bak on the first switch.
+  # read-only so gui can't shadow nix
   xdg.stateFile."noctalia/settings.toml" = lib.mkIf osConfig.features.noctalia.locked { text = ""; };
 }

@@ -9,13 +9,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # needed at system level so vendor completions land and fish is a valid login shell
-    programs.fish = {
-        enable = true;
-        interactiveShellInit = ''
-            set fish_greeting # Disable greeting
-        '';
-    };
+    # login shell, vendor completions
+    programs.fish.enable = true;
     users.users.knyrps.shell = pkgs.fish;
   };
 }

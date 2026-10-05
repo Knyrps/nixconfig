@@ -93,12 +93,7 @@ let
     })();
   '';
 
-  # firefox keys its addon cache on xpi path + mtime. hm links every xpi through
-  # a stable path into the store (mtime 1), so version bumps go unnoticed and the
-  # profile ends up with stale/missing addons. drop the cache whenever the
-  # resolved xpi set changes, but only for profiles that aren't running.
-  # also re-push the noctalia theme once pywalfox's native host is up, since
-  # noctalia only pushes on palette changes and a fresh firefox starts unthemed.
+  # reset stale addon cache, re-push theme
   prelaunch = pkgs.writeShellScript "firefox-prelaunch" ''
     root="''${XDG_CONFIG_HOME:-$HOME/.config}/mozilla/firefox"
     cache="''${XDG_CACHE_HOME:-$HOME/.cache}/mozilla/firefox"

@@ -1,8 +1,6 @@
-{ inputs, pkgs, ... }:
+{ inputs, ... }:
 
 {
-  home.packages = [ pkgs.streamcontroller ];
-
   xdg.dataFile."StreamController/plugins/DiscordSC".source = inputs.discord-sc;
 
   wayland.windowManager.niri.settings.input.touch.map-to-output = "HP Inc. Slice20 Unknown";

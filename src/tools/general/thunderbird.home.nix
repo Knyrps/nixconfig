@@ -38,18 +38,16 @@ in
       address = cfg.address;
       realName = cfg.realName;
 
-      # web.de authenticates with the full address, not a short login name
+      # full address as login
       userName = cfg.address;
 
-      # freemail accounts ship with pop3/imap switched off. it has to be
-      # enabled under Einstellungen -> POP3/IMAP before any of this connects.
+      # enable pop3/imap in web.de first
       imap = {
         host = "imap.web.de";
         port = 993;
         tls.enable = true;
       };
 
-      # 465 with implicit tls also works; 587 is what web.de documents
       smtp = {
         host = "smtp.web.de";
         port = 587;
@@ -59,8 +57,7 @@ in
         };
       };
 
-      # thunderbird keeps the password in its own store, so there is no secret
-      # here to keep out of the repo
+      # password kept by thunderbird
       thunderbird.enable = true;
     };
   };

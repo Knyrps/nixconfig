@@ -40,7 +40,7 @@ in
         notification-error = s p.error;
         equalizer = s p.primary;
         misc = s p.outline;
-        # comfy-only keys; without them the playbar fill is invisible until hovered
+        # comfy playbar fill
         progress-fg = s p.primary;
         progress-bg = s p.outline;
       };

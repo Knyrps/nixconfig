@@ -4,7 +4,7 @@
   options.host = {
     roles = lib.mkOption {
       type = lib.types.listOf (lib.types.enum [
-        "ui" "laptop" "ssh" "bluetooth" "networkmanager" "personal" "work" "coding" "gaming"
+        "ui" "laptop" "ssh" "bluetooth" "networkmanager" "personal" "work" "coding" "gaming" "multimedia"
       ]);
       default = [ ];
     };

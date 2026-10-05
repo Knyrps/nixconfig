@@ -107,9 +107,10 @@
   };
 
   cursor = {
-    name = "Bibata-Modern-Amber";
-    package = pkgs.bibata-cursors;
+    name = "Bibata-oceanWaves";
     size = 18;
+    # dark palette keys
+    colors = { base = "primary"; outline = "on_surface"; watch = "surface"; };
   };
 
   icons = {

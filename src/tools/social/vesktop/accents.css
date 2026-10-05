@@ -1,6 +1,4 @@
-/* --accent-1 is the orange, --accent-3 the primary green. the bot tag sat on
-   --accent-2 (near-brown, unreadable), so make it green and give the orange
-   to the unread divider, the focused chatbar and hovered panel borders. */
+/* readable bot tag, orange accents */
 :root:root {
   --border-hover: color-mix(in srgb, var(--accent-1) 45%, var(--active));
 }

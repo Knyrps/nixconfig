@@ -17,7 +17,7 @@ let
     format_on_save = "on";
   };
 
-  # vtsls only emits inlay hints when asked to; Zed's inlay_hints toggle alone isn't enough
+  # vtsls needs explicit inlay hints
   tsInlayHints.inlayHints = {
     parameterNames = { enabled = "all"; suppressWhenArgumentMatchesName = true; };
     parameterTypes.enabled = true;
@@ -39,7 +39,7 @@ in
       extensions = [
         # current
         "nix" "lua" "luau"
-        # frontend (TS/JS/TSX/CSS/JSON/YAML/Markdown are built in)
+        # frontend
         "html" "scss" "vue" "angular"
         # backend / Sitecore
         "csharp" "xml" "sql" "powershell"
@@ -51,9 +51,9 @@ in
         nil nixd
         lua-language-server
         luau luau-lsp
-        nodejs                 # runtime for npm-based servers (TS, Vue, Angular, HTML, CSS, YAML) and prettier
+        nodejs                 # for npm-based servers
         prettier
-        omnisharp-roslyn       # native binary — Zed's auto-download won't run on NixOS
+        omnisharp-roslyn       # zed's download fails on nixos
       ];
 
       userKeymaps = [
@@ -78,22 +78,18 @@ in
       ];
 
       userSettings = {
-        # match the login shell instead of zed's default /bin/sh
+        # match login shell
         terminal.shell.program = lib.getExe pkgs.fish;
 
-        # 4-space indentation everywhere; languages below inherit it
         tab_size = tabWidth;
         hard_tabs = false;
 
-        # Keep the signature popover up while the cursor is inside a call's parentheses,
-        # and bring it back after accepting a completion or typing a bracket pair.
+        # keep signature help open
         auto_signature_help = true;
         show_signature_help_after_edits = true;
 
-        # Snappier hover docs
         hover_popover_delay = 150;
 
-        # Inline parameter names and inferred types
         inlay_hints = {
           enabled = true;
           show_type_hints = true;
@@ -104,7 +100,7 @@ in
           scroll_debounce_ms = 50;
         };
 
-        # Point Zed at Nix's node so it stops trying to download its own
+        # use nix's node
         node = {
           path = lib.getExe pkgs.nodejs;
           npm_path = lib.getExe' pkgs.nodejs "npm";

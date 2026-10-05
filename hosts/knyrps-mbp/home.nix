@@ -1,13 +1,7 @@
 { ... }:
 
 {
-  # The T2 internal mic is a 3-element array exposed as AUX0/AUX1/AUX2 with no
-  # channel positions, so clients grab AUX0+AUX1 as if they were L/R. Those are
-  # two physically separated mics, and any mono downmix (Discord, Meet, ...)
-  # sums the same voice at two arrival times -> comb filtering -> robotic voice.
-  #
-  # Expose a real mono source built from one element instead. Switch AUX0 to
-  # AUX1/AUX2 below if another element of the array sounds better.
+  # mono source from one array mic
   xdg.configFile."pipewire/pipewire.conf.d/10-t2-mic-mono.conf".text = ''
     context.modules = [
       { name = libpipewire-module-loopback

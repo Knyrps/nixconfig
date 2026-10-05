@@ -6,9 +6,7 @@ let
 
   offload = osConfig.hardware.nvidia.prime.offload.enable or false;
 
-  # Blackmagic re-rolled the 21.1 archive, so the hash our nixpkgs pin carries is
-  # stale. This is the corrected value from nixpkgs master; drop the override once
-  # the pin catches up. runCommandLocal is only used for the src fetch.
+  # stale upstream hash, drop on pin bump
   resolve = pkgs.davinci-resolve.override {
     runCommandLocal = name: env: cmd:
       pkgs.runCommandLocal name
@@ -16,7 +14,7 @@ let
         cmd;
   };
 
-  # Resolve needs a CUDA/OpenCL capable GPU, so force it onto the dGPU.
+  # needs the dGPU
   package =
     if offload then
       pkgs.symlinkJoin {
@@ -36,7 +34,7 @@ let
 in
 {
   options.features.davinci-resolve.enable = lib.mkEnableOption "davinci resolve" // {
-    default = has "ui" && has "personal";
+    default = has "ui" && has "multimedia";
   };
 
   config = lib.mkIf cfg.enable {

@@ -25,8 +25,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # nsswitch resolves `files` before `dns`, so these have to be answered
-    # authoritatively rather than forwarded. hostsdir does that.
+    # nsswitch checks files before dns
     networking.networkmanager.dns = "dnsmasq";
 
     environment.etc."NetworkManager/dnsmasq.d/work-hosts.conf".text = ''
@@ -34,8 +33,7 @@ in
       conf-dir=${cfg.dir}/dnsmasq,*.conf
     '';
 
-    # dnsmasq re-reads these after dropping privileges. keeping them out of git
-    # is the point, not hiding them locally.
+    # readable by dnsmasq
     systemd.tmpfiles.rules = [
       "d ${cfg.dir} 0755 root root -"
       "d ${cfg.dir}/hosts 0755 root root -"

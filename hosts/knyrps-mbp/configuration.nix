@@ -12,9 +12,7 @@
     };
     consoleLogLevel = 3;
 
-    # Bottom-row modifiers in Windows order.
-    # swap_opt_cmd:      ctrl | opt | cmd  -> ctrl | super | alt
-    # swap_fn_leftctrl:  fn | ctrl | ...   -> ctrl | fn | ...
+    # windows-order modifiers
     kernelParams = [
       "hid_apple.swap_opt_cmd=1"
       "hid_apple.swap_fn_leftctrl=1"
@@ -38,22 +36,9 @@
       }))
     ];
 
-    # Left at the default (false). Setting it true writes
-    # "options apple-gmux force_igd=y", which muxes the internal panel to the
-    # UHD 630 -- amdgpu then cannot reach the panel's DDC lines to read its
-    # EDID, so the Navi 14 sits idle while the iGPU struggles with 3072x1920.
-    # apple-t2.enableIGPU = true;
+    # no enableIGPU, breaks panel EDID
   };
 
-  # appletbdrm intermittently times out probing the Touch Bar display at boot
-  # ("Failed to get display information", -110), leaving the 05ac:8302 interface
-  # unbound. No DRM card then means no /dev/tiny_dfr_display, and tiny-dfr
-  # BindsTo that device, so the row stays dark for the whole session.
-  #
-  # Re-binding the interface does NOT help: the bind re-runs the same probe and
-  # times out again. Cycling the device's USB configuration does -- it is the
-  # same 0 -> 2 transition the tiny-dfr udev rule performs at enumeration, and
-  # it re-initialises the display controller so the next probe succeeds.
   systemd.services.appletbdrm-rebind = {
     description = "Reset the Touch Bar display when appletbdrm times out probing it";
     wantedBy = [ "multi-user.target" ];
@@ -66,8 +51,7 @@
 
         bound() { find "$drv" -maxdepth 1 -name '*:*' 2>/dev/null | grep -q .; }
 
-        # the Touch Bar display, found by id so a shifting bus number cannot
-        # point this at the keyboard (1-5) or the touch bar backlight (1-7)
+        # by id, bus numbers shift
         dev=""
         for attempt in 1 2 3 4 5; do
           for d in /sys/bus/usb/devices/*; do
@@ -98,9 +82,7 @@
     };
   };
 
-  # Drives the Touch Bar function row (tiny-dfr). Its brightness keys emit the
-  # same XF86MonBrightness* events the binds above handle, so the row, the OSD
-  # and gmux_backlight all stay on one value.
+  # touch bar function row
   hardware.apple.touchBar.enable = true;
 
   services.t2fanrd = {
