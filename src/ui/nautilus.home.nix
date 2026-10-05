@@ -12,6 +12,14 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [ pkgs.file-roller ];
 
+    home.file."${config.xdg.dataHome}/nautilus/scripts/Annotate" = lib.mkIf config.features.satty.enable {
+      executable = true;
+      text = ''
+        #!${pkgs.runtimeShell}
+        exec ${lib.getExe pkgs.satty} -f "$(printf '%s' "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS" | head -n1)"
+      '';
+    };
+
     # right-click -> Scripts -> Copy Path
     home.file."${config.xdg.dataHome}/nautilus/scripts/Copy Path" = {
       executable = true;
