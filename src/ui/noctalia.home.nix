@@ -42,5 +42,5 @@ lib.mkIf osConfig.features.noctalia.enable {
   # changes would silently shadow everything above. an empty store symlink makes
   # it unwritable: noctalia logs one warning per attempt and keeps the declared
   # value. previous contents land in settings.toml.hm-bak on the first switch.
-  xdg.stateFile."noctalia/settings.toml".text = "";
+  xdg.stateFile."noctalia/settings.toml" = lib.mkIf osConfig.features.noctalia.locked { text = ""; };
 }
