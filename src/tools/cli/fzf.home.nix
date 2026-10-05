@@ -18,6 +18,7 @@ in
       defaultCommand = "fd --type f --follow";
       fileWidget.command = "fd --type f --follow";
       changeDirWidget.command = "fd --type d --follow";
+      historyWidget.command = "";
 
       defaultOptions = [
         "--ansi"
@@ -40,11 +41,6 @@ in
         "--bind='ctrl-p:toggle-preview'"
       ];
 
-      historyWidget.options = [
-        "--no-sort"
-        "--exact"
-      ];
-
       colors = {
         bg = p.surface;
         "bg+" = p.hover;
@@ -63,6 +59,23 @@ in
         scrollbar = p.secondary;
         list-label = p.on_surface_variant;
       };
+    };
+
+    programs.fish = lib.mkIf config.features.atuin.enable {
+      functions.__fzf_atuin_history = ''
+        set -l selection (
+          atuin history list --human --print0 --format '{exit}'\t'{duration}'\t'{command}' 2>/dev/null \
+          | awk 'BEGIN { RS = "\0"; ORS = "\0"; FS = "\t"; OFS = "\t" } !seen[$3]++ { if ($1 == "0") $1 = "\033[32m\xe2\x9c\x93 \033[0m"; else $1 = "\033[31m\xe2\x9c\x97 " $1 "\033[0m"; $2 = sprintf("\033[2m%-6s\033[0m", $2); print }' \
+          | fzf --read0 --ansi --no-sort --exact --delimiter \t --with-nth 1,2,3 --nth 3 --query (commandline -b) --input-label ' History '
+        )
+        and commandline -r -- (string split -m 2 \t $selection)[3]
+        commandline -f repaint
+      '';
+
+      interactiveShellInit = lib.mkAfter ''
+        bind \cr __fzf_atuin_history
+        bind up __fzf_atuin_history
+      '';
     };
   };
 }
