@@ -27,6 +27,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:soopyc/nixos-hardware/apple-t2-updates";
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, nixos-hardware, t2fanrd, ... }@inputs:
@@ -59,6 +63,7 @@
         t2fanrd.nixosModules.t2fanrd
       ];
       headless         = mkHost "headless" [ ];
+      wsl              = mkHost "wsl" [ inputs.nixos-wsl.nixosModules.default ];
     };
   };
 }

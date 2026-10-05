@@ -22,6 +22,24 @@ lib.mkIf osConfig.features.noctalia.enable {
         ];
       };
 
+      bar.default = {
+        position = "top";
+        margin_ends = 0;
+        margin_edge = 0;
+        radius = 0;
+        shadow = false;
+        start = [ "workspaces" ];
+        center = [ "clock" ];
+        end = [ "media" "tray" "notifications" "clipboard" "network" "bluetooth" "volume" "brightness" "battery" "control-center" "session" ];
+      };
+
+      shell.font_family = "Inter";
+
+      idle.behavior = {
+        lock = { timeout = 600; action = "lock"; enabled = true; };
+        "screen-off" = { timeout = 660; action = "screen_off"; enabled = true; };
+      };
+
       shell.screenshot = {
         annotate = true;
         directory = "~/Pictures/Screenshots";
@@ -29,18 +47,25 @@ lib.mkIf osConfig.features.noctalia.enable {
       };
 
       theme = {
-        source = "builtin";
-        builtin = "Noctalia";
+        source = "custom";
+        custom_palette = "street";
         mode = "dark";
+        templates.builtin_ids = [ "gtk3" "gtk4" ];
       };
 
-      wallpaper.default.path = "${config.programs.noctalia.package}/share/noctalia/assets/noctalia-wallpaper.png";
+      wallpaper = {
+        fill_mode = "center";
+        fill_color = "#191919";
+        default.path = "${../../../assets/wallpapers/street.png}";
+      };
     };
   };
+
+  xdg.configFile."noctalia/palettes/street.json".source = ./street.json;
 
   # noctalia's state layer outranks ~/.config/noctalia, so gui and `noctalia msg`
   # changes would silently shadow everything above. an empty store symlink makes
   # it unwritable: noctalia logs one warning per attempt and keeps the declared
   # value. previous contents land in settings.toml.hm-bak on the first switch.
-  xdg.stateFile."noctalia/settings.toml".text = "";
+  xdg.stateFile."noctalia/settings.toml" = lib.mkIf osConfig.features.noctalia.locked { text = ""; };
 }

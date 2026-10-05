@@ -1,4 +1,4 @@
-{ osConfig, config, lib, ... }:
+{ osConfig, config, lib, pkgs, ... }:
 
 let
   cfg = config.features.gtk;
@@ -10,6 +10,22 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    gtk.enable = true;
+    gtk = {
+      enable = true;
+      theme = {
+        name = "adw-gtk3-dark";
+        package = pkgs.adw-gtk3;
+      };
+    };
+
+    dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
+
+    qt = {
+      enable = true;
+      platformTheme.name = "adwaita";
+      style.name = "adwaita-dark";
+    };
+
+    home.packages = [ pkgs.glib ];
   };
 }

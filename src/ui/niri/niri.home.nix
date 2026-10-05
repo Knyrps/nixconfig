@@ -8,7 +8,31 @@ lib.mkIf osConfig.features.niri.enable {
 
     prefer-no-csd = true;
 
+    overview.workspace-shadow.off = { };
+
+    debug.honor-xdg-activation-with-invalid-serial = { };
+
     _children = [
+      {
+        window-rule = {
+          geometry-corner-radius = 12;
+          clip-to-geometry = true;
+        };
+      }
+      {
+        layer-rule = {
+          match._props.namespace = "^noctalia-wallpaper";
+          place-within-backdrop = true;
+        };
+      }
+      {
+        window-rule = {
+          match._props.app-id = "dev.noctalia.Noctalia";
+          open-floating = true;
+          default-column-width.fixed = 1080;
+          default-window-height.fixed = 920;
+        };
+      }
       {
         window-rule = {
           match._props = { app-id = "firefox$"; title = "^Picture-in-Picture$"; };
@@ -39,7 +63,8 @@ lib.mkIf osConfig.features.niri.enable {
     };
 
     layout = {
-      gaps = 16;
+      gaps = 8;
+      background-color = "transparent";
       center-focused-column = "never";
 
       preset-column-widths._children = [
@@ -80,8 +105,9 @@ lib.mkIf osConfig.features.niri.enable {
 
       "Mod+T" = { _props.hotkey-overlay-title = "Open a Terminal: wezterm"; spawn = "wezterm"; };
       "Mod+D" = { _props.hotkey-overlay-title = "Run an Application: fuzzel"; spawn = "fuzzel"; };
+      "Alt+Tab" = { _props.hotkey-overlay-title = "Switch Windows"; spawn-sh = "noctalia msg window-switcher hold"; };
       "Mod+E".spawn-sh = "nautilus ~/";
-      "Super+Alt+L" = { _props.hotkey-overlay-title = "Lock the Screen: swaylock"; spawn = "swaylock"; };
+      "Super+Alt+L" = { _props.hotkey-overlay-title = "Lock the Screen"; spawn = [ "noctalia" "msg" "session" "lock" ]; };
       "Super+Alt+S" = {
         _props = { allow-when-locked = true; hotkey-overlay-title = null; };
         spawn-sh = "pkill orca || exec orca";
@@ -99,9 +125,9 @@ lib.mkIf osConfig.features.niri.enable {
         spawn = "pick-color";
       };
 
-      "XF86AudioRaiseVolume" = { _props.allow-when-locked = true; spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0"; };
-      "XF86AudioLowerVolume" = { _props.allow-when-locked = true; spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-"; };
-      "XF86AudioMute" = { _props.allow-when-locked = true; spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; };
+      "XF86AudioRaiseVolume" = { _props.allow-when-locked = true; spawn-sh = "noctalia msg volume-up"; };
+      "XF86AudioLowerVolume" = { _props.allow-when-locked = true; spawn-sh = "noctalia msg volume-down"; };
+      "XF86AudioMute" = { _props.allow-when-locked = true; spawn-sh = "noctalia msg volume-mute"; };
       "XF86AudioMicMute" = { _props.allow-when-locked = true; spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; };
       "XF86AudioPlay" = { _props.allow-when-locked = true; spawn-sh = "playerctl play-pause"; };
       "XF86AudioStop" = { _props.allow-when-locked = true; spawn-sh = "playerctl stop"; };
