@@ -82,6 +82,7 @@ lib.mkIf osConfig.features.niri.enable {
 
       "Mod+T" = { _props.hotkey-overlay-title = "Open a Terminal: wezterm"; spawn = "wezterm"; };
       "Mod+D" = { _props.hotkey-overlay-title = "Run an Application: fuzzel"; spawn = "fuzzel"; };
+      "Alt+Tab" = { _props.hotkey-overlay-title = "Switch Windows"; spawn-sh = "noctalia msg window-switcher hold"; };
       "Mod+E".spawn-sh = "nautilus ~/";
       "Super+Alt+L" = { _props.hotkey-overlay-title = "Lock the Screen"; spawn = [ "noctalia" "msg" "session" "lock" ]; };
       "Super+Alt+S" = {
