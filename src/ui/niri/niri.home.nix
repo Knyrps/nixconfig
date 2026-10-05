@@ -14,6 +14,12 @@ lib.mkIf osConfig.features.niri.enable {
 
     _children = [
       {
+        window-rule = {
+          geometry-corner-radius = 12;
+          clip-to-geometry = true;
+        };
+      }
+      {
         layer-rule = {
           match._props.namespace = "^noctalia-wallpaper";
           place-within-backdrop = true;
@@ -57,7 +63,7 @@ lib.mkIf osConfig.features.niri.enable {
     };
 
     layout = {
-      gaps = 16;
+      gaps = 8;
       background-color = "transparent";
       center-focused-column = "never";
 
