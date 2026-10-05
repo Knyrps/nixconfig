@@ -22,7 +22,7 @@ let
   documents = [ "application/msword" "application/vnd.openxmlformats-officedocument.wordprocessingml.document" "application/vnd.oasis.opendocument.text" "application/rtf" "text/rtf" ];
   sheets = [ "application/vnd.ms-excel" "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" "application/vnd.oasis.opendocument.spreadsheet" ];
   slides = [ "application/vnd.ms-powerpoint" "application/vnd.openxmlformats-officedocument.presentationml.presentation" "application/vnd.oasis.opendocument.presentation" ];
-  mail = [ "x-scheme-handler/mailto" "message/rfc822" "text/calendar" "x-scheme-handler/net.thunderbird" ];
+  mail = [ "x-scheme-handler/mailto" "message/rfc822" "text/calendar" "x-scheme-handler/net.thunderbird" "x-scheme-handler/webcal" "x-scheme-handler/webcals" ];
   drawings = [ "application/vnd.oasis.opendocument.graphics" "application/vnd.visio" ];
 in
 {
