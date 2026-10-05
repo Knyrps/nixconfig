@@ -14,6 +14,10 @@ lib.mkIf osConfig.features.niri.enable {
 
     overview.workspace-shadow.off = { };
 
+    # noctalia provides the window switcher; drop niri's, whose default
+    # Alt+Shift+Tab bind would otherwise still win.
+    recent-windows.off = { };
+
     debug.honor-xdg-activation-with-invalid-serial = { };
 
     _children = [
@@ -110,6 +114,8 @@ lib.mkIf osConfig.features.niri.enable {
       "Mod+T" = { _props.hotkey-overlay-title = "Open a Terminal: wezterm"; spawn = "wezterm"; };
       "Mod+D" = { _props.hotkey-overlay-title = "Run an Application: fuzzel"; spawn = "fuzzel"; };
       "Alt+Tab" = { _props.hotkey-overlay-title = "Switch Windows"; spawn-sh = "noctalia msg window-switcher hold"; };
+      # no reverse ipc action; once open, shift+tab cycles backwards.
+      "Alt+Shift+Tab" = { _props.hotkey-overlay-title = null; spawn-sh = "noctalia msg window-switcher hold"; };
       "Mod+E".spawn-sh = "nautilus ~/";
       "Super+Alt+L" = { _props.hotkey-overlay-title = "Lock the Screen"; spawn = [ "noctalia" "msg" "session" "lock" ]; };
       "Super+Alt+S" = {

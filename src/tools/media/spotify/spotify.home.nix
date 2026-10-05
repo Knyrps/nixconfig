@@ -19,6 +19,7 @@ in
       enable = true;
       wayland = true;
       theme = spice.themes.comfy;
+      enabledSnippets = [ (builtins.readFile ./spotify.css) ];
       customColorScheme = {
         text = s p.on_surface;
         subtext = s p.on_surface_variant;

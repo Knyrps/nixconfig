@@ -1,0 +1,29 @@
+/* --accent-1 is the orange, --accent-3 the primary green. the bot tag sat on
+   --accent-2 (near-brown, unreadable), so make it green and give the orange
+   to the unread divider, the focused chatbar and hovered panel borders. */
+:root:root {
+  --border-hover: color-mix(in srgb, var(--accent-1) 45%, var(--active));
+}
+
+[class*="botTag__"] {
+  background-color: var(--accent-3) !important;
+  color: var(--text-0) !important;
+}
+
+[class*="isUnread__"] {
+  border-color: var(--accent-1) !important;
+}
+[class*="isUnread__"] [class*="content__"] {
+  color: var(--accent-1) !important;
+}
+[class*="unreadPill__"] {
+  background-color: var(--accent-1) !important;
+  color: var(--text-0) !important;
+}
+[class*="unreadPill__"] svg {
+  color: var(--accent-1) !important;
+}
+
+[class*="channelTextArea__"]:focus-within {
+  border-color: color-mix(in srgb, var(--accent-1) 60%, var(--active)) !important;
+}

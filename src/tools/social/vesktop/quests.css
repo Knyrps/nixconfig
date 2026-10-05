@@ -1,0 +1,6 @@
+/* hide discord quests: the promo bar above the user panel and the
+   quests entry in the dm list. */
+[class*="panels_"] > [class*="mask__"]:has([data-testid="quest-bar-container"]),
+[class*="wrapper__"]:has(> li a[href="/quest-home"]) {
+  display: none !important;
+}

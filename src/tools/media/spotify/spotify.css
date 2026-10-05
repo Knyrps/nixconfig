@@ -1,0 +1,60 @@
+/* fixes for comfy on current spotify. comfy's css is fetched live from
+   comfy-themes.github.io, so these may become no-ops when upstream catches up. */
+
+/* spotify's top-container grid gained a leading top-banner row, but comfy
+   still sizes 3 rows, so 1fr lands on global-nav and squeezes main-view
+   to the bottom. prepend an auto row for the banner. */
+:root:root .global-nav .Root__top-container {
+  grid-template-rows: auto max(48px, var(--comfy-topbar-height, 64px) / var(--zoom, 1) - 16px) minmax(0, 1fr) auto;
+}
+
+/* comfy's custom playbar floats the cover art 18px above the bar, over
+   the library list; shrink it so it fits above the elapsed time. */
+:root:root {
+  --cover-art-width: 72px;
+  --cover-art-height: 72px;
+  --cover-art-bottom: 8px;
+}
+
+/* the home header falls back to spotify's neutral grey; --spice-button
+   is the orange and turns brown under comfy's dark overlay, so use the
+   green-grey misc colour instead. */
+:root .main-home-homeHeader {
+  background-color: var(--spice-misc) !important;
+}
+
+/* comfy pushes entity headers down 64px for a topbar that used to overlay
+   main-view; it has its own grid row now, so that just leaves a gap.
+   spotify also scales the header image 1.1x past its overlay, leaving an
+   undimmed strip above the action bar. */
+:root .global-nav .Root__main-view .main-view-container .main-entityHeader-container {
+  margin-top: 0 !important;
+}
+:root .before-scroll-node > div > div[style*="background-image"] {
+  transform: none !important;
+}
+
+/* spotify's new encore play button lost its background under comfy,
+   leaving a dark icon on nothing. */
+:root .main-actionBar-ActionBar [class*="button-primary__inner"] {
+  background-color: var(--spice-button) !important;
+  color: var(--spice-main) !important;
+}
+
+/* comfy leaves the progress track transparent, so early in a song the
+   bar is invisible. */
+:root .playback-progressbar .x-progressBar-progressBarBg {
+  background-color: color-mix(in srgb, var(--spice-text) 15%, transparent) !important;
+}
+
+/* comfy pulls the play button 24px up to overlap the old banner edge; in
+   the centred action bar row that leaves it 12px above its siblings. */
+:root .main-actionBar-ActionBar .main-playButton-PlayButton {
+  margin-top: 0 !important;
+}
+
+/* the header fades to 50% black but comfy starts the action bar gradient
+   at 60%, leaving a visible step where they meet. */
+:root .main-actionBarBackground-background {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5) 0%, var(--spice-main) 100%), var(--tracklist-gradient-noise) !important;
+}
