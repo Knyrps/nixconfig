@@ -76,23 +76,23 @@ lib.mkIf osConfig.features.niri.enable {
 
       focus-ring = {
         width = 4;
-        active-color = "#7fc8ff";
-        inactive-color = "#505050";
+        active-color = p.primary;
+        inactive-color = p.outline;
       };
 
       border = {
         off = { };
         width = 4;
-        active-color = "#ffc87f";
-        inactive-color = "#505050";
-        urgent-color = "#9b0000";
+        active-color = p.secondary;
+        inactive-color = p.outline;
+        urgent-color = p.error;
       };
 
       shadow = {
         softness = 30;
         spread = 5;
         offset._props = { x = 0; y = 5; };
-        color = "#0007";
+        color = c.withAlpha p.shadow 0.47;
       };
     };
 
