@@ -12,7 +12,7 @@ let
     sha256 = "sha256-F6/TeRS7T8FtVDQV26x3n1P55ZsvoUP7AadwFnAhS/g=";
     meta = { };
   };
-  common = with addons; [ ublock-origin ipvfoo volume-master pywalfox ];
+  common = with addons; [ ublock-origin ipvfoo pywalfox ];
 
   xpi = { pname, version, addonId, url, sha256 }:
     addons.buildFirefoxXpiAddon { inherit pname version addonId url sha256; meta = { }; };
@@ -50,6 +50,7 @@ let
   };
 
   private = with addons; [
+    volume-master
     proton-pass
     sponsorblock
     return-youtube-dislikes
