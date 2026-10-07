@@ -36,6 +36,10 @@
       url = "github:kuska1/Material-Theme";
       flake = false;
     };
+    repo = {
+      url = "github:knyrps/repo";
+      flake = false;
+    };
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
       inputs.nixpkgs.follows = "nixpkgs";

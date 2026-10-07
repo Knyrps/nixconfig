@@ -244,6 +244,22 @@
         "type": "github"
       }
     },
+    "repo": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791374445,
+        "narHash": "sha256-N5tVOnYaCJ+ocPwC5R8obncPYDyCm9zwCXihdJiCiLE=",
+        "owner": "knyrps",
+        "repo": "repo",
+        "rev": "4050086149873e3ab0564cbd167b7144c47427c0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "knyrps",
+        "repo": "repo",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "discord-sc": "discord-sc",
@@ -254,6 +270,7 @@
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_3",
         "nur": "nur",
+        "repo": "repo",
         "spicetify-nix": "spicetify-nix",
         "t2fanrd": "t2fanrd",
         "xwayland-satellite": "xwayland-satellite"
