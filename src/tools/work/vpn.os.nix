@@ -24,6 +24,14 @@ let
   # plugin detects libreswan via ipsec --version
   plugin = (pkgs.networkmanager-l2tp.override { strongswan = libreswan; }).overrideAttrs (o: {
     configureFlags = o.configureFlags ++ [ "--enable-libreswan-dh2" ];
+
+    # libreswan 5.4 fails ipsec up when left/right protocols differ
+    postPatch = (o.postPatch or "") + ''
+      substituteInPlace src/nm-l2tp-service.c \
+        --replace-fail \
+          ${lib.escapeShellArg "if (!use_ephemeral_port) {\n            write_config_option(fd, \"  leftprotoport=udp/l2tp\\n\");"} \
+          ${lib.escapeShellArg "{\n            write_config_option(fd, use_ephemeral_port ? \"  leftprotoport=udp/%%any\\n\" : \"  leftprotoport=udp/l2tp\\n\");"}
+    '';
   });
 in
 {
