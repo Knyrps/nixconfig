@@ -14,6 +14,10 @@ let
         --replace-fail '.type = IKE_ALG_KEM,' '.type = &ike_alg_ke,' \
         --replace-fail 'IKEv2_KEM_MODP1024' 'IKEv2_KE_MODP1024' \
         --replace-fail '.kem_ops =' '.ke_ops ='
+
+      # updown env incl. nix store PATH overflows 2048
+      substituteInPlace programs/pluto/updown.c \
+        --replace-fail 'char buffer[2048];' 'char buffer[8192];'
     '';
   });
 
