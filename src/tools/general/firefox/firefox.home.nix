@@ -94,34 +94,10 @@ let
     })();
   '';
 
-  # reset stale addon cache, re-push theme
-  prelaunch = pkgs.writeShellScript "firefox-prelaunch" ''
-    root="''${XDG_CONFIG_HOME:-$HOME/.config}/mozilla/firefox"
-    cache="''${XDG_CACHE_HOME:-$HOME/.cache}/mozilla/firefox"
-    for dir in "$root"/*/; do
-      dir=''${dir%/}
-      [ -d "$dir/extensions" ] || continue
-      if [ -L "$dir/lock" ]; then
-        pid=$(readlink "$dir/lock"); pid=''${pid##*+}
-        kill -0 "$pid" 2>/dev/null && continue
-      fi
-      stamp=$(readlink -f "$dir"/extensions/*.xpi | sort | ${pkgs.coreutils}/bin/sha256sum)
-      [ "$stamp" = "$(cat "$dir/.hm-extensions-stamp" 2>/dev/null)" ] && continue
-      rm -f "$dir/addonStartup.json.lz4" "$dir/extensions.json"
-      rm -rf "$cache/''${dir##*/}/startupCache"
-      printf '%s\n' "$stamp" > "$dir/.hm-extensions-stamp"
-    done
-
-    if command -v noctalia >/dev/null; then
-      ${pkgs.util-linux}/bin/setsid -f sh -c '
-        for i in $(seq 60); do
-          ${pkgs.procps}/bin/pgrep -u "$(id -u)" -f native-messaging-hosts/pywalfox.json >/dev/null && break
-          sleep 1
-        done
-        sleep 1
-        noctalia firefox-theme update
-      ' >/dev/null 2>&1
-    fi
+  # unsynced clock makes every addon fail its signature check
+  clockGuard = pkgs.writeShellScript "firefox-clock-guard" ''
+    [ -e /run/systemd/timesync/synchronized ] || ${pkgs.libnotify}/bin/notify-send -u critical \
+      "Firefox: clock not synced" "Extensions will fail signature checks until NTP syncs."
   '';
 in
 {
@@ -205,11 +181,34 @@ in
       };
     };
 
+    # reset addon cache when the xpi set changed or a bad clock left addons disabled
+    home.activation.firefoxAddonCache = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+      root="$HOME/${config.programs.firefox.configPath}"
+      cache="''${XDG_CACHE_HOME:-$HOME/.cache}/mozilla/firefox"
+      for dir in "$root"/*/; do
+        dir=''${dir%/}
+        [ -d "$dir/extensions" ] || continue
+        if [ -L "$dir/lock" ]; then
+          pid=$(readlink "$dir/lock"); pid=''${pid##*+}
+          kill -0 "$pid" 2>/dev/null && continue
+        fi
+        stamp=$(readlink -f "$dir"/extensions/*.xpi | sort | ${pkgs.coreutils}/bin/sha256sum)
+        if [ "$stamp" = "$(cat "$dir/.hm-extensions-stamp" 2>/dev/null)" ] \
+          && ! ${pkgs.jq}/bin/jq -e 'any(.addons[]; .location == "app-profile" and .appDisabled)' \
+            "$dir/extensions.json" >/dev/null 2>&1; then
+          continue
+        fi
+        run rm -f "$dir/addonStartup.json.lz4" "$dir/extensions.json"
+        run rm -rf "$cache/''${dir##*/}/startupCache"
+        [ -n "''${DRY_RUN:-}" ] || printf '%s\n' "$stamp" > "$dir/.hm-extensions-stamp"
+      done
+    '';
+
     programs.firefox = {
       enable = true;
       configPath = ".config/mozilla/firefox";
       package = (pkgs.firefox.override { extraPrefsFiles = [ keybindings ]; }).overrideAttrs (old: {
-        makeWrapperArgs = old.makeWrapperArgs ++ [ "--run" "${prelaunch}" ];
+        makeWrapperArgs = old.makeWrapperArgs ++ [ "--run" "${clockGuard}" ];
       });
 
       policies = {
