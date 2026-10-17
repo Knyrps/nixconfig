@@ -12,7 +12,7 @@ lib.mkIf osConfig.features.noctalia.enable {
       lockscreen_widgets.enabled = false;
 
       # the panel, not the touch bar
-      brightness.backlight_device = "gmux_backlight";
+      brightness.monitor.eDP-1.backlight_device = "gmux_backlight";
 
       plugins = {
         enabled = [ "knyrps/nix-search" "lucasoe/proton-pass" ];
