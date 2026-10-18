@@ -93,7 +93,10 @@
     };
   };
 
-  host.roles = [ "ui" "ssh" "laptop" "bluetooth" "networkmanager" "coding" "personal" "work" ];
+  # times out activation when the usb ethernet adapter has no link
+  systemd.services.NetworkManager-wait-online.enable = false;
+
+  host.roles =[ "ui" "ssh" "laptop" "bluetooth" "networkmanager" "coding" "personal" "work" ];
 
   features.ssh.unsafe = true;
 
