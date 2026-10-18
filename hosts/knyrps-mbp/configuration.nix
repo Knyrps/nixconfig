@@ -93,7 +93,7 @@
     };
   };
 
-  host.roles = [ "ui" "ssh" "laptop" "bluetooth" "networkmanager" "coding" "personal" ];
+  host.roles = [ "ui" "ssh" "laptop" "bluetooth" "networkmanager" "coding" "personal" "work" ];
 
   features.ssh.unsafe = true;
 
