@@ -1,5 +1,25 @@
 { pkgs, ... }:
 
+let
+  rtcOffsetRestore = pkgs.writeShellScript "rtc-offset-restore" ''
+    mkdir -p /run/rtc-offset /var/lib/rtc-offset
+    rtc=$(cat /sys/class/rtc/rtc0/since_epoch) || exit 0
+    read up _ < /proc/uptime
+    echo "$rtc ''${up%.*}" > /run/rtc-offset/ref
+
+    # before 2000 = firmware base, not real time
+    [ "$rtc" -lt 946684800 ] || exit 0
+
+    # never go below the last known time
+    floor=$(stat -c %Y /var/lib/systemd/timesync/clock 2>/dev/null || echo 0)
+    target=0
+    [ -s /var/lib/rtc-offset/offset ] && target=$(( rtc + $(cat /var/lib/rtc-offset/offset) ))
+    [ "$target" -ge "$floor" ] || target=$floor
+
+    [ "$target" -gt "$(date +%s)" ] && date -s "@$target" > /dev/null
+    exit 0
+  '';
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -81,6 +101,47 @@
       '';
     };
   };
+
+  # firmware resets the rtc to a ~1970 base on every boot (it still ticks), so
+  # learn rtc->real offset after ntp sync and apply it when the rtc looks bogus
+  systemd.services.rtc-offset-restore = {
+    description = "Correct system clock from bogus T2 RTC using learned offset";
+    after = [ "dev-rtc0.device" ];
+    serviceConfig = {
+      Type = "oneshot";
+      StateDirectory = "rtc-offset";
+      RuntimeDirectory = "rtc-offset";
+      RuntimeDirectoryPreserve = true;
+      ExecStart = rtcOffsetRestore;
+    };
+  };
+
+  systemd.paths.rtc-offset-save = {
+    wantedBy = [ "multi-user.target" ];
+    pathConfig.PathExists = "/run/systemd/timesync/synchronized";
+  };
+
+  systemd.services.rtc-offset-save = {
+    description = "Learn T2 RTC offset after NTP sync";
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      StateDirectory = "rtc-offset";
+      ExecStart = pkgs.writeShellScript "rtc-offset-save" ''
+        read rtc up0 < /run/rtc-offset/ref || exit 0
+        [ "$rtc" -lt 946684800 ] || exit 0
+        read up _ < /proc/uptime
+        echo $(( $(date +%s) - (''${up%.*} - up0) - rtc )) > /var/lib/rtc-offset/offset
+      '';
+    };
+  };
+
+  services.udev.extraRules = ''
+    SUBSYSTEM=="rtc", KERNEL=="rtc0", TAG+="systemd", ENV{SYSTEMD_WANTS}+="rtc-offset-restore.service"
+  '';
+
+  # hibernate resume goes through firmware too
+  powerManagement.resumeCommands = "${rtcOffsetRestore}";
 
   # touch bar function row
   hardware.apple.touchBar.enable = true;
