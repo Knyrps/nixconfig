@@ -15,7 +15,6 @@ let
   };
 
   work = with addons; [
-    onepassword-password-manager
     angular-devtools
     react-devtools
     vue-js-devtools
