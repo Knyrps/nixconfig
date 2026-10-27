@@ -154,6 +154,20 @@ in
     };
   };
 
+  # s3 never resumes on sonoma+ t2 firmware, cold boots instead; hibernate
+  # can't work with random-encrypted swap
+  services.logind.settings.Login = {
+    HandleLidSwitch = "lock";
+    HandleLidSwitchExternalPower = "lock";
+    HandlePowerKey = "lock";
+  };
+  systemd.sleep.settings.Sleep = {
+    AllowSuspend = "no";
+    AllowHibernation = "no";
+    AllowHybridSleep = "no";
+    AllowSuspendThenHibernate = "no";
+  };
+
   # times out activation when the usb ethernet adapter has no link
   systemd.services.NetworkManager-wait-online.enable = false;
 
