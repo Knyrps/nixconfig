@@ -10,6 +10,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ pkgs.musescore ];
+    home.packages = [
+      # unity build breaks with qt 6.12 qmlcachegen (ambiguous `Type`)
+      (pkgs.musescore.overrideAttrs (old: {
+        cmakeFlags = old.cmakeFlags ++ [ "-DMUSE_COMPILE_USE_UNITY:BOOL=OFF" ];
+      }))
+    ];
   };
 }
