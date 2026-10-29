@@ -10,7 +10,7 @@ let
   resolve = pkgs.davinci-resolve.override {
     runCommandLocal = name: env: cmd:
       pkgs.runCommandLocal name
-        (env // { outputHash = "sha256-+3SB32EHpH9/0hM3h8CrO6f7V4ZAmxUFh3P8m6QDeO0="; })
+        (env // { outputHash = "sha256-hU27MRgjuBv201uR4tdI1P4ay8dCKyhNBtxwZ9CajJM="; })
         cmd;
   };
 
