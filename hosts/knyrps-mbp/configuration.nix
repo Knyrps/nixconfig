@@ -66,37 +66,59 @@ in
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
+      # the waits below can add up; don't let systemd kill us mid-recovery
+      TimeoutStartSec = 240;
       ExecStart = pkgs.writeShellScript "appletbdrm-rebind" ''
         drv=/sys/bus/usb/drivers/appletbdrm
 
         bound() { find "$drv" -maxdepth 1 -name '*:*' 2>/dev/null | grep -q .; }
-
         # by id, bus numbers shift
-        dev=""
-        for attempt in 1 2 3 4 5; do
+        find_dev() {
           for d in /sys/bus/usb/devices/*; do
             case "$(basename "$d")" in *:*) continue;; esac
             [ "$(cat "$d/idVendor" 2>/dev/null)" = "05ac" ] || continue
             [ "$(cat "$d/idProduct" 2>/dev/null)" = "8302" ] || continue
-            dev="$d"; break
+            echo "$d"; return 0
           done
-          [ -n "$dev" ] && break
-          sleep 2
-        done
-        [ -n "$dev" ] || exit 0
+          return 1
+        }
 
-        bound && exit 0
-
-        for attempt in 1 2 3; do
-          echo 0 > "$dev/bConfigurationValue" 2>/dev/null || true
-          sleep 2
-          echo 2 > "$dev/bConfigurationValue" 2>/dev/null || true
-          sleep 3
-          if bound; then
-            systemctl --no-block start tiny-dfr.service || true
-            exit 0
-          fi
+        # the appletbdrm module autoloads only once the usb device enumerates,
+        # so at boot we may run before the driver even exists; wait for both the
+        # driver to register and the device to appear before touching anything
+        for i in $(seq 1 60); do
+          [ -d "$drv" ] && find_dev >/dev/null && break
+          sleep 1
         done
+        find_dev >/dev/null || exit 0
+
+        # give the kernel's own probe (and the udev add-time config reset) a
+        # chance to settle; if it binds on its own there's nothing to recover
+        for i in $(seq 1 15); do
+          bound && break
+          sleep 1
+        done
+
+        # probe timed out (-110) and left the interface unbound: power-cycle the
+        # usb config to force a re-probe, retrying until the panel comes up. the
+        # old version gave up after 3 quick tries and, worse, usually ran before
+        # the probe had even failed, so the failure was never retried
+        if ! bound; then
+          for attempt in $(seq 1 8); do
+            dev=$(find_dev) || break
+            echo 0 > "$dev/bConfigurationValue" 2>/dev/null || true
+            sleep 2
+            echo 2 > "$dev/bConfigurationValue" 2>/dev/null || true
+            for i in $(seq 1 8); do
+              bound && break 2
+              sleep 1
+            done
+          done
+        fi
+
+        # udev usually also starts tiny-dfr via the re-added input device, but
+        # make sure once the display is bound
+        bound && systemctl --no-block start tiny-dfr.service
         exit 0
       '';
     };
