@@ -184,14 +184,21 @@ in
           kill -0 "$pid" 2>/dev/null && continue
         fi
         stamp=$(readlink -f "$dir"/extensions/*.xpi | sort | ${pkgs.coreutils}/bin/sha256sum)
-        if [ "$stamp" = "$(cat "$dir/.hm-extensions-stamp" 2>/dev/null)" ] \
-          && ! ${pkgs.jq}/bin/jq -e 'any(.addons[]; .location == "app-profile" and .appDisabled)' \
-            "$dir/extensions.json" >/dev/null 2>&1; then
-          continue
+        changed=0;  [ "$stamp" = "$(cat "$dir/.hm-extensions-stamp" 2>/dev/null)" ] || changed=1
+        disabled=0; ${pkgs.jq}/bin/jq -e 'any(.addons[]; .location == "app-profile" and .appDisabled)' \
+          "$dir/extensions.json" >/dev/null 2>&1 && disabled=1
+
+        # An addon-set change only needs the regenerable startup caches dropped;
+        # Firefox rescans extensions/ on every launch, so keeping extensions.json
+        # means updated addons are NOT re-registered as freshly installed.
+        if [ "$changed" = 1 ] || [ "$disabled" = 1 ]; then
+          run rm -f "$dir/addonStartup.json.lz4"
+          run rm -rf "$cache/''${dir##*/}/startupCache"
         fi
-        run rm -f "$dir/addonStartup.json.lz4" "$dir/extensions.json"
-        run rm -rf "$cache/''${dir##*/}/startupCache"
-        [ -n "''${DRY_RUN:-}" ] || printf '%s\n' "$stamp" > "$dir/.hm-extensions-stamp"
+        # Only a stuck appDisabled (e.g. signature checks that failed under a
+        # skewed boot clock) needs the registry wiped to force re-verification.
+        [ "$disabled" = 1 ] && run rm -f "$dir/extensions.json"
+        [ "$changed" = 1 ] && { [ -n "''${DRY_RUN:-}" ] || printf '%s\n' "$stamp" > "$dir/.hm-extensions-stamp"; }
       done
     '';
 
