@@ -54,6 +54,7 @@
         ./hosts/${name}/configuration.nix
         ./core.nix
         { networking.hostName = name; }
+        { nixpkgs.overlays = [ inputs.firefox-addons.overlays.default ]; }
         home-manager.nixosModules.default
         {
           home-manager = {
