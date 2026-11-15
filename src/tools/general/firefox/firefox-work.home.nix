@@ -1,10 +1,11 @@
-{ osConfig, config, lib, pkgs, ... }:
+{ osConfig, config, lib, pkgs, inputs, ... }:
 
 let
   cfg = config.features.firefox-work;
   has = osConfig.host.has;
   fx = config.lib.firefox;
-  addons = pkgs.nur.repos.rycee.firefox-addons;
+  system = pkgs.stdenv.hostPlatform.system;
+  addons = inputs.firefox-addons.packages.${system} // inputs.firefox-addons.lib.${system};
 
   sitecore-extensions = fx.xpi {
     pname = "sitecore-extensions";

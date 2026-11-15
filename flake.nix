@@ -22,8 +22,8 @@
       url = "github:GnomedDev/T2FanRD";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nur = {
-      url = "github:nix-community/NUR";
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:soopyc/nixos-hardware/apple-t2-updates";
@@ -54,7 +54,6 @@
         ./hosts/${name}/configuration.nix
         ./core.nix
         { networking.hostName = name; }
-        { nixpkgs.overlays = [ inputs.nur.overlays.default ]; }
         home-manager.nixosModules.default
         {
           home-manager = {

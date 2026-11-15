@@ -1,9 +1,10 @@
-{ osConfig, config, lib, pkgs, ... }:
+{ osConfig, config, lib, pkgs, inputs, ... }:
 
 let
   cfg = config.features.firefox;
   has = osConfig.host.has;
-  addons = pkgs.nur.repos.rycee.firefox-addons;
+  system = pkgs.stdenv.hostPlatform.system;
+  addons = inputs.firefox-addons.packages.${system} // inputs.firefox-addons.lib.${system};
   common = with addons; [ ublock-origin ipvfoo pywalfox ];
 
   xpi = { pname, version, addonId, url, sha256 }:
