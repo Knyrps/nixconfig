@@ -1,67 +1,65 @@
-{ osConfig, lib, ... }:
+{ osConfig, config, lib, ... }:
 
 let
   p = osConfig.theme.palette.dark;
   c = osConfig.theme.lib;
 in
 lib.mkIf osConfig.features.niri.enable {
-  wayland.windowManager.niri.enable = true;
-
-  wayland.windowManager.niri.settings = {
-    clipboard.disable-primary = [ ];
+  # niri itself is installed + enabled by the system module (niri.os.nix via
+  # niri-flake's nixosModule); here we only generate the config file.
+  programs.niri.settings = {
+    clipboard.disable-primary = true;
 
     prefer-no-csd = true;
 
-    overview.workspace-shadow.off = { };
+    overview.workspace-shadow.enable = false;
 
-    # noctalia owns the switcher
-    recent-windows.off = { };
+    # (niri-flake has no `recent-windows` option; noctalia owns the switcher
+    #  regardless, so niri's default window-switching is simply unused.)
 
-    debug.honor-xdg-activation-with-invalid-serial = { };
+    debug.honor-xdg-activation-with-invalid-serial = [ ];
 
-    _children = [
+    window-rules = [
       {
-        window-rule = {
-          geometry-corner-radius = 12;
-          clip-to-geometry = true;
+        geometry-corner-radius = {
+          top-left = 12.0;
+          top-right = 12.0;
+          bottom-left = 12.0;
+          bottom-right = 12.0;
         };
+        clip-to-geometry = true;
       }
       {
-        layer-rule = {
-          match._props.namespace = "^noctalia-wallpaper";
-          place-within-backdrop = true;
-        };
+        matches = [ { app-id = "dev.noctalia.Noctalia"; } ];
+        open-floating = true;
+        default-column-width = { fixed = 1080; };
+        default-window-height = { fixed = 920; };
       }
       {
-        window-rule = {
-          match._props.app-id = "dev.noctalia.Noctalia";
-          open-floating = true;
-          default-column-width.fixed = 1080;
-          default-window-height.fixed = 920;
-        };
+        matches = [ { app-id = "firefox$"; title = "^Picture-in-Picture$"; } ];
+        open-floating = true;
       }
       {
-        window-rule = {
-          match._props = { app-id = "firefox$"; title = "^Picture-in-Picture$"; };
-          open-floating = true;
-        };
+        matches = [ { app-id = "org.gnome.NautilusPreviewer"; } ];
+        open-floating = true;
+        open-focused = true;
       }
+    ];
+
+    layer-rules = [
       {
-        window-rule = {
-          match._props.app-id = "org.gnome.NautilusPreviewer";
-          open-floating = true;
-          open-focused = true;
-        };
+        matches = [ { namespace = "^noctalia-wallpaper"; } ];
+        place-within-backdrop = true;
       }
     ];
 
     input = {
-      keyboard.numlock = { };
+      keyboard.numlock = true;
 
       touchpad = {
-        tap = { };
-        dwt = { };                      # ignore pad while typing
-        dwtp = { };                     # ... and while the trackpoint moves
+        tap = true;
+        dwt = true;                     # ignore pad while typing
+        dwtp = true;                    # ... and while the trackpoint moves
         accel-profile = "adaptive";
         scroll-method = "two-finger";
         click-method = "clickfinger";   # two-finger right click
@@ -74,204 +72,209 @@ lib.mkIf osConfig.features.niri.enable {
       background-color = "transparent";
       center-focused-column = "never";
 
-      preset-column-widths._children = [
+      preset-column-widths = [
         { proportion = 0.25; }
         { proportion = 0.5; }
         { proportion = 0.75; }
       ];
-      default-column-width.proportion = 0.5;
+      default-column-width = { proportion = 0.5; };
 
       focus-ring = {
         width = 4;
-        active-color = p.primary;
-        inactive-color = p.outline;
+        active.color = p.primary;
+        inactive.color = p.outline;
       };
 
       border = {
-        off = { };
+        enable = false;
         width = 4;
-        active-color = p.secondary;
-        inactive-color = p.outline;
-        urgent-color = p.error;
+        active.color = p.secondary;
+        inactive.color = p.outline;
+        urgent.color = p.error;
       };
 
       shadow = {
+        enable = true;
         softness = 30;
         spread = 5;
-        offset._props = { x = 0; y = 5; };
+        offset = { x = 0; y = 5; };
         color = c.withAlpha p.shadow 0.47;
       };
     };
 
     screenshot-path = "~/Pictures/Screenshots/Screenshot__%Y-%m-%d_%H-%M-%S.png";
 
-    binds = {
-      "Mod+F1".show-hotkey-overlay = { };
+    binds = with config.lib.niri.actions; let
+      sh = spawn "sh" "-c";
+    in {
+      "Mod+F1".action = show-hotkey-overlay;
 
-      "Mod+Shift+Escape".toggle-keyboard-shortcuts-inhibit = {};
+      "Mod+Shift+Escape".action = toggle-keyboard-shortcuts-inhibit;
 
-      "Mod+T" = { _props.hotkey-overlay-title = "Open a Terminal: wezterm"; spawn = "wezterm"; };
-      "Mod+D" = { _props.hotkey-overlay-title = "Run an Application: fuzzel"; spawn = "fuzzel"; };
-      "Alt+Tab" = { _props.hotkey-overlay-title = "Switch Windows"; spawn-sh = "noctalia msg window-switcher hold"; };
+      "Mod+T" = { action = spawn "wezterm"; hotkey-overlay.title = "Open a Terminal: wezterm"; };
+      "Mod+D" = { action = spawn "fuzzel"; hotkey-overlay.title = "Run an Application: fuzzel"; };
+      "Alt+Tab" = { action = sh "noctalia msg window-switcher hold"; hotkey-overlay.title = "Switch Windows"; };
       # shift+tab cycles back
-      "Alt+Shift+Tab" = { _props.hotkey-overlay-title = null; spawn-sh = "noctalia msg window-switcher hold"; };
-      "Mod+E".spawn-sh = "nautilus ~/";
-      "Super+Alt+L" = { _props.hotkey-overlay-title = "Lock the Screen"; spawn = [ "noctalia" "msg" "session" "lock" ]; };
+      "Alt+Shift+Tab" = { action = sh "noctalia msg window-switcher hold"; hotkey-overlay.hidden = true; };
+      "Mod+E".action = sh "nautilus ~/";
+      "Super+Alt+L" = { action = spawn "noctalia" "msg" "session" "lock"; hotkey-overlay.title = "Lock the Screen"; };
       "Super+Alt+S" = {
-        _props = { allow-when-locked = true; hotkey-overlay-title = null; };
-        spawn-sh = "pkill orca || exec orca";
+        action = sh "pkill orca || exec orca";
+        allow-when-locked = true;
+        hotkey-overlay.hidden = true;
       };
 
       "Alt+Space" = {
-        _props.hotkey-overlay-title = "Toggle Application Launcher";
-        spawn = [ "noctalia" "msg" "panel-toggle" "launcher" ];
+        action = spawn "noctalia" "msg" "panel-toggle" "launcher";
+        hotkey-overlay.title = "Toggle Application Launcher";
       };
-      "Mod+V".spawn-sh = "noctalia msg panel-toggle clipboard";
-      "Mod+Shift+S".spawn-sh = "noctalia msg screenshot-region";
-      "Mod+Ctrl+Shift+S".spawn-sh = "noctalia msg screenshot-annotate";
+      "Mod+V".action = sh "noctalia msg panel-toggle clipboard";
+      "Mod+Shift+S".action = sh "noctalia msg screenshot-region";
+      "Mod+Ctrl+Shift+S".action = sh "noctalia msg screenshot-annotate";
       "Mod+Shift+C" = {
-        _props = { repeat = false; hotkey-overlay-title = "Pick a Color: hyprpicker"; };
-        spawn = "pick-color";
+        action = spawn "pick-color";
+        repeat = false;
+        hotkey-overlay.title = "Pick a Color: hyprpicker";
       };
 
-      "XF86AudioRaiseVolume" = { _props.allow-when-locked = true; spawn-sh = "noctalia msg volume-up"; };
-      "XF86AudioLowerVolume" = { _props.allow-when-locked = true; spawn-sh = "noctalia msg volume-down"; };
-      "XF86AudioMute" = { _props.allow-when-locked = true; spawn-sh = "noctalia msg volume-mute"; };
-      "XF86AudioMicMute" = { _props.allow-when-locked = true; spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; };
-      "XF86AudioPlay" = { _props.allow-when-locked = true; spawn-sh = "playerctl play-pause"; };
-      "XF86AudioStop" = { _props.allow-when-locked = true; spawn-sh = "playerctl stop"; };
-      "XF86AudioPrev" = { _props.allow-when-locked = true; spawn-sh = "playerctl previous"; };
-      "XF86AudioNext" = { _props.allow-when-locked = true; spawn-sh = "playerctl next"; };
+      "XF86AudioRaiseVolume" = { action = sh "noctalia msg volume-up"; allow-when-locked = true; };
+      "XF86AudioLowerVolume" = { action = sh "noctalia msg volume-down"; allow-when-locked = true; };
+      "XF86AudioMute" = { action = sh "noctalia msg volume-mute"; allow-when-locked = true; };
+      "XF86AudioMicMute" = { action = sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; allow-when-locked = true; };
+      "XF86AudioPlay" = { action = sh "playerctl play-pause"; allow-when-locked = true; };
+      "XF86AudioStop" = { action = sh "playerctl stop"; allow-when-locked = true; };
+      "XF86AudioPrev" = { action = sh "playerctl previous"; allow-when-locked = true; };
+      "XF86AudioNext" = { action = sh "playerctl next"; allow-when-locked = true; };
       # noctalia can't write gmux_backlight
-      "XF86MonBrightnessUp" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg brightness-osd "$(brightnessctl -d gmux_backlight -m set +10% | cut -d, -f4 | tr -d '%')"''; };
-      "XF86MonBrightnessDown" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg brightness-osd "$(brightnessctl -d gmux_backlight -m set 10%- | cut -d, -f4 | tr -d '%')"''; };
+      "XF86MonBrightnessUp" = { action = sh ''noctalia msg brightness-osd "$(brightnessctl -d gmux_backlight -m set +10% | cut -d, -f4 | tr -d '%')"''; allow-when-locked = true; };
+      "XF86MonBrightnessDown" = { action = sh ''noctalia msg brightness-osd "$(brightnessctl -d gmux_backlight -m set 10%- | cut -d, -f4 | tr -d '%')"''; allow-when-locked = true; };
 
       # noctalia steps too finely
-      "XF86KbdBrightnessUp" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg keyboard-backlight-osd "$(brightnessctl -d ':white:kbd_backlight' -m set +10% | cut -d, -f4 | tr -d '%')"''; };
-      "XF86KbdBrightnessDown" = { _props.allow-when-locked = true; spawn-sh = ''noctalia msg keyboard-backlight-osd "$(brightnessctl -d ':white:kbd_backlight' -m set 10%- | cut -d, -f4 | tr -d '%')"''; };
+      "XF86KbdBrightnessUp" = { action = sh ''noctalia msg keyboard-backlight-osd "$(brightnessctl -d ':white:kbd_backlight' -m set +10% | cut -d, -f4 | tr -d '%')"''; allow-when-locked = true; };
+      "XF86KbdBrightnessDown" = { action = sh ''noctalia msg keyboard-backlight-osd "$(brightnessctl -d ':white:kbd_backlight' -m set 10%- | cut -d, -f4 | tr -d '%')"''; allow-when-locked = true; };
 
-      "Mod+O" = { _props.repeat = false; toggle-overview = { }; };
-      "Mod+Q" = { _props.repeat = false; close-window = { }; };
+      "Mod+O" = { action = toggle-overview; repeat = false; };
+      "Mod+Q" = { action = close-window; repeat = false; };
 
-      "Mod+Left".focus-column-left = { };
-      "Mod+Down".focus-window-down = { };
-      "Mod+Up".focus-window-up = { };
-      "Mod+Right".focus-column-right = { };
-      "Mod+H".focus-column-left = { };
-      "Mod+J".focus-window-down = { };
-      "Mod+K".focus-window-up = { };
-      "Mod+L".focus-column-right = { };
+      "Mod+Left".action = focus-column-left;
+      "Mod+Down".action = focus-window-down;
+      "Mod+Up".action = focus-window-up;
+      "Mod+Right".action = focus-column-right;
+      "Mod+H".action = focus-column-left;
+      "Mod+J".action = focus-window-down;
+      "Mod+K".action = focus-window-up;
+      "Mod+L".action = focus-column-right;
 
-      "Mod+Ctrl+Left".move-column-left = { };
-      "Mod+Ctrl+Down".move-window-down = { };
-      "Mod+Ctrl+Up".move-window-up = { };
-      "Mod+Ctrl+Right".move-column-right = { };
-      "Mod+Ctrl+H".move-column-left = { };
-      "Mod+Ctrl+J".move-window-down = { };
-      "Mod+Ctrl+K".move-window-up = { };
-      "Mod+Ctrl+L".move-column-right = { };
+      "Mod+Ctrl+Left".action = move-column-left;
+      "Mod+Ctrl+Down".action = move-window-down;
+      "Mod+Ctrl+Up".action = move-window-up;
+      "Mod+Ctrl+Right".action = move-column-right;
+      "Mod+Ctrl+H".action = move-column-left;
+      "Mod+Ctrl+J".action = move-window-down;
+      "Mod+Ctrl+K".action = move-window-up;
+      "Mod+Ctrl+L".action = move-column-right;
 
-      "Mod+Home".focus-column-first = { };
-      "Mod+End".focus-column-last = { };
-      "Mod+Ctrl+Home".move-column-to-first = { };
-      "Mod+Ctrl+End".move-column-to-last = { };
+      "Mod+Home".action = focus-column-first;
+      "Mod+End".action = focus-column-last;
+      "Mod+Ctrl+Home".action = move-column-to-first;
+      "Mod+Ctrl+End".action = move-column-to-last;
 
-      "Mod+Shift+Left".focus-monitor-left = { };
-      "Mod+Shift+Down".focus-monitor-down = { };
-      "Mod+Shift+Up".focus-monitor-up = { };
-      "Mod+Shift+Right".focus-monitor-right = { };
-      "Mod+Shift+H".focus-monitor-left = { };
-      "Mod+Shift+J".focus-monitor-down = { };
-      "Mod+Shift+K".focus-monitor-up = { };
-      "Mod+Shift+L".focus-monitor-right = { };
+      "Mod+Shift+Left".action = focus-monitor-left;
+      "Mod+Shift+Down".action = focus-monitor-down;
+      "Mod+Shift+Up".action = focus-monitor-up;
+      "Mod+Shift+Right".action = focus-monitor-right;
+      "Mod+Shift+H".action = focus-monitor-left;
+      "Mod+Shift+J".action = focus-monitor-down;
+      "Mod+Shift+K".action = focus-monitor-up;
+      "Mod+Shift+L".action = focus-monitor-right;
 
-      "Mod+Shift+Ctrl+Left".move-column-to-monitor-left = { };
-      "Mod+Shift+Ctrl+Down".move-column-to-monitor-down = { };
-      "Mod+Shift+Ctrl+Up".move-column-to-monitor-up = { };
-      "Mod+Shift+Ctrl+Right".move-column-to-monitor-right = { };
-      "Mod+Shift+Ctrl+H".move-column-to-monitor-left = { };
-      "Mod+Shift+Ctrl+J".move-column-to-monitor-down = { };
-      "Mod+Shift+Ctrl+K".move-column-to-monitor-up = { };
-      "Mod+Shift+Ctrl+L".move-column-to-monitor-right = { };
+      "Mod+Shift+Ctrl+Left".action = move-column-to-monitor-left;
+      "Mod+Shift+Ctrl+Down".action = move-column-to-monitor-down;
+      "Mod+Shift+Ctrl+Up".action = move-column-to-monitor-up;
+      "Mod+Shift+Ctrl+Right".action = move-column-to-monitor-right;
+      "Mod+Shift+Ctrl+H".action = move-column-to-monitor-left;
+      "Mod+Shift+Ctrl+J".action = move-column-to-monitor-down;
+      "Mod+Shift+Ctrl+K".action = move-column-to-monitor-up;
+      "Mod+Shift+Ctrl+L".action = move-column-to-monitor-right;
 
-      "Mod+Page_Down".focus-workspace-down = { };
-      "Mod+Page_Up".focus-workspace-up = { };
-      "Mod+U".focus-workspace-down = { };
-      "Mod+I".focus-workspace-up = { };
-      "Mod+Ctrl+Page_Down".move-column-to-workspace-down = { };
-      "Mod+Ctrl+Page_Up".move-column-to-workspace-up = { };
-      "Mod+Ctrl+U".move-column-to-workspace-down = { };
-      "Mod+Ctrl+I".move-column-to-workspace-up = { };
+      "Mod+Page_Down".action = focus-workspace-down;
+      "Mod+Page_Up".action = focus-workspace-up;
+      "Mod+U".action = focus-workspace-down;
+      "Mod+I".action = focus-workspace-up;
+      "Mod+Ctrl+Page_Down".action = move-column-to-workspace-down;
+      "Mod+Ctrl+Page_Up".action = move-column-to-workspace-up;
+      "Mod+Ctrl+U".action = move-column-to-workspace-down;
+      "Mod+Ctrl+I".action = move-column-to-workspace-up;
 
-      "Mod+Shift+Page_Down".move-workspace-down = { };
-      "Mod+Shift+Page_Up".move-workspace-up = { };
-      "Mod+Shift+U".move-workspace-down = { };
-      "Mod+Shift+I".move-workspace-up = { };
+      "Mod+Shift+Page_Down".action = move-workspace-down;
+      "Mod+Shift+Page_Up".action = move-workspace-up;
+      "Mod+Shift+U".action = move-workspace-down;
+      "Mod+Shift+I".action = move-workspace-up;
 
-      "Mod+1".focus-workspace = 1;
-      "Mod+2".focus-workspace = 2;
-      "Mod+3".focus-workspace = 3;
-      "Mod+4".focus-workspace = 4;
-      "Mod+5".focus-workspace = 5;
-      "Mod+6".focus-workspace = 6;
-      "Mod+7".focus-workspace = 7;
-      "Mod+8".focus-workspace = 8;
-      "Mod+9".focus-workspace = 9;
-      "Mod+Ctrl+1".move-column-to-workspace = 1;
-      "Mod+Ctrl+2".move-column-to-workspace = 2;
-      "Mod+Ctrl+3".move-column-to-workspace = 3;
-      "Mod+Ctrl+4".move-column-to-workspace = 4;
-      "Mod+Ctrl+5".move-column-to-workspace = 5;
-      "Mod+Ctrl+6".move-column-to-workspace = 6;
-      "Mod+Ctrl+7".move-column-to-workspace = 7;
-      "Mod+Ctrl+8".move-column-to-workspace = 8;
-      "Mod+Ctrl+9".move-column-to-workspace = 9;
+      "Mod+1".action = focus-workspace 1;
+      "Mod+2".action = focus-workspace 2;
+      "Mod+3".action = focus-workspace 3;
+      "Mod+4".action = focus-workspace 4;
+      "Mod+5".action = focus-workspace 5;
+      "Mod+6".action = focus-workspace 6;
+      "Mod+7".action = focus-workspace 7;
+      "Mod+8".action = focus-workspace 8;
+      "Mod+9".action = focus-workspace 9;
+      "Mod+Ctrl+1".action.move-column-to-workspace = 1;
+      "Mod+Ctrl+2".action.move-column-to-workspace = 2;
+      "Mod+Ctrl+3".action.move-column-to-workspace = 3;
+      "Mod+Ctrl+4".action.move-column-to-workspace = 4;
+      "Mod+Ctrl+5".action.move-column-to-workspace = 5;
+      "Mod+Ctrl+6".action.move-column-to-workspace = 6;
+      "Mod+Ctrl+7".action.move-column-to-workspace = 7;
+      "Mod+Ctrl+8".action.move-column-to-workspace = 8;
+      "Mod+Ctrl+9".action.move-column-to-workspace = 9;
 
-      "Mod+WheelScrollDown" = { _props.cooldown-ms = 150; focus-workspace-down = { }; };
-      "Mod+WheelScrollUp" = { _props.cooldown-ms = 150; focus-workspace-up = { }; };
-      "Mod+Ctrl+WheelScrollDown" = { _props.cooldown-ms = 150; move-column-to-workspace-down = { }; };
-      "Mod+Ctrl+WheelScrollUp" = { _props.cooldown-ms = 150; move-column-to-workspace-up = { }; };
-      "Mod+WheelScrollRight".focus-column-right = { };
-      "Mod+WheelScrollLeft".focus-column-left = { };
-      "Mod+Ctrl+WheelScrollRight".move-column-right = { };
-      "Mod+Ctrl+WheelScrollLeft".move-column-left = { };
-      "Mod+Shift+WheelScrollDown".focus-column-right = { };
-      "Mod+Shift+WheelScrollUp".focus-column-left = { };
-      "Mod+Ctrl+Shift+WheelScrollDown".move-column-right = { };
-      "Mod+Ctrl+Shift+WheelScrollUp".move-column-left = { };
+      "Mod+WheelScrollDown" = { action = focus-workspace-down; cooldown-ms = 150; };
+      "Mod+WheelScrollUp" = { action = focus-workspace-up; cooldown-ms = 150; };
+      "Mod+Ctrl+WheelScrollDown" = { action = move-column-to-workspace-down; cooldown-ms = 150; };
+      "Mod+Ctrl+WheelScrollUp" = { action = move-column-to-workspace-up; cooldown-ms = 150; };
+      "Mod+WheelScrollRight".action = focus-column-right;
+      "Mod+WheelScrollLeft".action = focus-column-left;
+      "Mod+Ctrl+WheelScrollRight".action = move-column-right;
+      "Mod+Ctrl+WheelScrollLeft".action = move-column-left;
+      "Mod+Shift+WheelScrollDown".action = focus-column-right;
+      "Mod+Shift+WheelScrollUp".action = focus-column-left;
+      "Mod+Ctrl+Shift+WheelScrollDown".action = move-column-right;
+      "Mod+Ctrl+Shift+WheelScrollUp".action = move-column-left;
 
-      "Mod+BracketLeft".consume-or-expel-window-left = { };
-      "Mod+BracketRight".consume-or-expel-window-right = { };
-      "Mod+Comma".consume-window-into-column = { };
-      "Mod+Period".expel-window-from-column = { };
+      "Mod+BracketLeft".action = consume-or-expel-window-left;
+      "Mod+BracketRight".action = consume-or-expel-window-right;
+      "Mod+Comma".action = consume-window-into-column;
+      "Mod+Period".action = expel-window-from-column;
 
-      "Mod+R".switch-preset-column-width = { };
-      "Mod+Shift+R".switch-preset-column-width-back = { };
-      "Mod+Ctrl+Shift+R".switch-preset-window-height = { };
-      "Mod+Ctrl+R".reset-window-height = { };
+      "Mod+R".action = switch-preset-column-width;
+      "Mod+Shift+R".action = switch-preset-column-width-back;
+      "Mod+Ctrl+Shift+R".action = switch-preset-window-height;
+      "Mod+Ctrl+R".action = reset-window-height;
 
-      "Mod+F".maximize-column = { };
-      "Mod+Shift+F".fullscreen-window = { };
-      "Mod+M".maximize-window-to-edges = { };
-      "Mod+Ctrl+F".expand-column-to-available-width = { };
-      "Mod+C".center-column = { };
-      "Mod+Ctrl+C".center-visible-columns = { };
+      "Mod+F".action = maximize-column;
+      "Mod+Shift+F".action = fullscreen-window;
+      "Mod+M".action = maximize-window-to-edges;
+      "Mod+Ctrl+F".action = expand-column-to-available-width;
+      "Mod+C".action = center-column;
+      "Mod+Ctrl+C".action = center-visible-columns;
 
-      "Mod+Minus".set-column-width = "-10%";
-      "Mod+Equal".set-column-width = "+10%";
-      "Mod+Shift+Minus".set-window-height = "-10%";
-      "Mod+Shift+Equal".set-window-height = "+10%";
+      "Mod+Minus".action = set-column-width "-10%";
+      "Mod+Equal".action = set-column-width "+10%";
+      "Mod+Shift+Minus".action = set-window-height "-10%";
+      "Mod+Shift+Equal".action = set-window-height "+10%";
 
-      "Mod+W".toggle-column-tabbed-display = { };
+      "Mod+W".action = toggle-column-tabbed-display;
 
-      "Print".screenshot = { };
-      "Ctrl+Print".screenshot-screen = { };
-      "Alt+Print".screenshot-window = { };
+      "Print".action.screenshot = { };
+      "Ctrl+Print".action.screenshot-screen = { };
+      "Alt+Print".action.screenshot-window = { };
 
-      "Mod+Escape" = { _props.allow-inhibiting = false; toggle-keyboard-shortcuts-inhibit = { }; };
-      "Mod+Shift+E".quit = { };
-      "Ctrl+Alt+Delete".quit = { };
-      "Mod+Shift+P".power-off-monitors = { };
+      "Mod+Escape" = { action = toggle-keyboard-shortcuts-inhibit; allow-inhibiting = false; };
+      "Mod+Shift+E".action = quit;
+      "Ctrl+Alt+Delete".action = quit;
+      "Mod+Shift+P".action = power-off-monitors;
     };
   };
 }

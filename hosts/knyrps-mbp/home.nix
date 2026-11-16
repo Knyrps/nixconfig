@@ -5,7 +5,7 @@
   programs.noctalia.settings.idle.pre_action_fade_seconds = 0;
 
   # let logind handle it, niri would suspend
-  wayland.windowManager.niri.settings.input.disable-power-key-handling = { };
+  programs.niri.settings.input.power-key-handling.enable = false;
 
   # mono source from one array mic
   xdg.configFile."pipewire/pipewire.conf.d/10-t2-mic-mono.conf".text = ''

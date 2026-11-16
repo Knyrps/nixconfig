@@ -16,9 +16,8 @@ in
       enable = true;
 
       defaultCommand = "fd --type f --follow";
-      fileWidget.command = "fd --type f --follow";
-      changeDirWidget.command = "fd --type d --follow";
-      historyWidget.command = "";
+      fileWidgetCommand = "fd --type f --follow";
+      changeDirWidgetCommand = "fd --type d --follow";
 
       defaultOptions = [
         "--ansi"
@@ -30,7 +29,7 @@ in
         "--style=full:rounded"
       ];
 
-      fileWidget.options = [
+      fileWidgetOptions = [
         "--select-1"
         "--exit-0"
         "--preview='bat --color=always --style=numbers --line-range=:250 {}'"

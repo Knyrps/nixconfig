@@ -12,7 +12,7 @@ in
     # kernel keyring is per-session
     home.packages = [
       (pkgs.proton-pass-cli.overrideAttrs (old: {
-        postFixup = old.postFixup + ''
+        postFixup = (old.postFixup or "") + ''
           wrapProgram $out/bin/pass-cli --set PROTON_PASS_LINUX_KEYRING dbus
         '';
       }))
