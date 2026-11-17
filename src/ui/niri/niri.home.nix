@@ -61,7 +61,8 @@ lib.mkIf osConfig.features.niri.enable {
         dwt = true;                     # ignore pad while typing
         dwtp = true;                    # ... and while the trackpoint moves
         accel-profile = "adaptive";
-        natural-scroll = true;          # content follows fingers
+        natural-scroll = false;         # traditional: content moves opposite fingers
+                                        # (niri-flake defaults this to true)
         scroll-method = "two-finger";
         click-method = "clickfinger";   # two-finger right click
         accel-speed = 0.2;              # -1.0 to 1.0
@@ -278,4 +279,14 @@ lib.mkIf osConfig.features.niri.enable {
       "Mod+Shift+P".action = power-off-monitors;
     };
   };
+
+  # home-manager swaps the config.kdl symlink; niri's file watcher is on the
+  # old store path, so it never notices. Without this the new config sits on
+  # disk unapplied until the next logout.
+  home.activation.niriReloadConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    for sock in /run/user/$(id -u)/niri.*.sock; do
+      [ -e "$sock" ] || continue
+      NIRI_SOCKET="$sock" ${osConfig.programs.niri.package}/bin/niri msg action load-config-file || true
+    done
+  '';
 }
