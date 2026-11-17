@@ -4,21 +4,12 @@ let
   cfg = config.features.work-vpn;
   has = config.host.has;
 
-  # ikev1 + dh2 for l2tp psk
+  # ikev1 + dh2 (modp1024) for the legacy l2tp psk gateway.
+  # stable (26.05) ships libreswan 5.3.3, which still uses the old ike_alg_dh.c
+  # naming and has no buffer[2048] in updown.c — the KEM→KE rename and the
+  # PATH-overflow patches only applied to 5.4+, so neither is carried here.
   libreswan = pkgs.libreswan.overrideAttrs (o: {
     makeFlags = o.makeFlags ++ [ "USE_DH2=true" ];
-
-    # upstream missed renaming the dh2 block
-    postPatch = (o.postPatch or "") + ''
-      substituteInPlace lib/libswan/ike_alg_ke.c \
-        --replace-fail '.type = IKE_ALG_KEM,' '.type = &ike_alg_ke,' \
-        --replace-fail 'IKEv2_KEM_MODP1024' 'IKEv2_KE_MODP1024' \
-        --replace-fail '.kem_ops =' '.ke_ops ='
-
-      # updown env incl. nix store PATH overflows 2048
-      substituteInPlace programs/pluto/updown.c \
-        --replace-fail 'char buffer[2048];' 'char buffer[8192];'
-    '';
   });
 
   # plugin detects libreswan via ipsec --version

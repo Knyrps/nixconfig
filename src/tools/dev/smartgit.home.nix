@@ -13,7 +13,7 @@ in
     home.packages = [
       (pkgs.smartgit.overrideAttrs (old: {
         src = old.src.overrideAttrs (_: {
-          outputHash = "sha256-xXhUrrJwCg9iyW5b71m5UJhNdEHL6pp2LKxXNfcEuzQ=";
+          outputHash = "sha256-XyMdojfyaTS3S3felGRvOOazx1mym/wE3j4GyCU9crc=";
         });
       }))
     ];
