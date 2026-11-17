@@ -61,20 +61,40 @@ in
     };
 
     programs.fish = lib.mkIf config.features.atuin.enable {
+      # $argv[1] is the fish input function to fall back to when atuin returns
+      # nothing -- it exits non-zero on e.g. a db migration mismatch after a
+      # nixpkgs bump, and without this the picker would just come up empty.
       functions.__fzf_atuin_history = ''
+        set -l fallback $argv[1]
+        test -n "$fallback"; or set fallback history-pager
+
         set -l width (math (tput cols) - 24)
+        set -l entries (mktemp)
+        atuin history list --human --print0 --format '{exit}'\t'{duration}'\t'{command}' 2>/dev/null \
+        | awk -v w=$width 'BEGIN { RS = "\0"; ORS = "\0"; FS = "\t" } $0 == "" { next } { n++; code[n] = $1; dur[n] = $2; cmd[n] = $3 } END { for (i = n; i > 0; i--) { if (seen[cmd[i]]++) continue; shown = cmd[i]; gsub(/\n/, " \xe2\x8f\x8e ", shown); status = (code[i] == "0") ? "\033[32m\xe2\x9c\x93\033[0m" : "\033[31m\xe2\x9c\x97\033[0m"; print sprintf("%-*s\t %s \t\033[2m%8s\033[0m\t%s", w, shown, status, dur[i], cmd[i]) } }' \
+        > $entries
+
+        if test ! -s $entries
+          rm -f $entries
+          commandline -f $fallback
+          return
+        end
+
         set -l selection (
-          atuin history list --human --print0 --format '{exit}'\t'{duration}'\t'{command}' 2>/dev/null \
-          | awk -v w=$width 'BEGIN { RS = "\0"; ORS = "\0"; FS = "\t" } { code[NR] = $1; dur[NR] = $2; cmd[NR] = $3 } END { for (i = NR; i > 0; i--) { if (seen[cmd[i]]++) continue; shown = cmd[i]; gsub(/\n/, " \xe2\x8f\x8e ", shown); status = (code[i] == "0") ? "\033[32m\xe2\x9c\x93\033[0m" : "\033[31m\xe2\x9c\x97\033[0m"; print sprintf("%-*s\t %s \t\033[2m%8s\033[0m\t%s", w, shown, status, dur[i], cmd[i]) } }' \
-          | fzf --read0 --ansi --no-sort --exact --layout=default --tabstop=1 --delimiter \t --with-nth 1,2,3 --nth 1 --query (commandline -b) --input-label ' History '
+          fzf --read0 --ansi --no-sort --exact --layout=default --tabstop=1 --delimiter \t --with-nth 1,2,3 --nth 1 --query (commandline -b) --input-label ' History ' < $entries
         )
-        and commandline -r -- (string split -m 3 \t $selection)[4]
+        set -l rc $status
+        rm -f $entries
+
+        if test $rc -eq 0 -a -n "$selection"
+          commandline -r -- (string split -m 3 \t $selection)[4]
+        end
         commandline -f repaint
       '';
 
       interactiveShellInit = lib.mkAfter ''
-        bind \cr __fzf_atuin_history
-        bind up __fzf_atuin_history
+        bind \cr '__fzf_atuin_history history-pager'
+        bind up '__fzf_atuin_history up-or-search'
       '';
     };
   };
