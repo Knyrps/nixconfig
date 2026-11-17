@@ -61,6 +61,7 @@ lib.mkIf osConfig.features.niri.enable {
         dwt = true;                     # ignore pad while typing
         dwtp = true;                    # ... and while the trackpoint moves
         accel-profile = "adaptive";
+        natural-scroll = true;          # content follows fingers
         scroll-method = "two-finger";
         click-method = "clickfinger";   # two-finger right click
         accel-speed = 0.2;              # -1.0 to 1.0
