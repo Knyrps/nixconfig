@@ -48,6 +48,11 @@
       url = "github:knyrps/repo";
       flake = false;
     };
+    # local tiny-dfr fork with the animated touch bar seascape
+    tiny-dfr = {
+      url = "git+file:///home/knyrps/code/tiny-dfr?ref=oceanwaves";
+      flake = false;
+    };
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
       inputs.nixpkgs.follows = "nixpkgs";

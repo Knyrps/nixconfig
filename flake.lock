@@ -397,6 +397,7 @@
         "repo": "repo",
         "spicetify-nix": "spicetify-nix",
         "t2fanrd": "t2fanrd",
+        "tiny-dfr": "tiny-dfr",
         "xwayland-satellite": "xwayland-satellite"
       }
     },
@@ -475,6 +476,23 @@
         "owner": "GnomedDev",
         "repo": "T2FanRD",
         "type": "github"
+      }
+    },
+    "tiny-dfr": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794959339,
+        "narHash": "sha256-eucGUD3HsAxftX3U8Gi0sYsUFeTxathmAjUWr+9oQQ8=",
+        "ref": "oceanwaves",
+        "rev": "8a263e4adafd29ca389f0321ad53637ff9017ed6",
+        "revCount": 138,
+        "type": "git",
+        "url": "file:///home/knyrps/code/tiny-dfr"
+      },
+      "original": {
+        "ref": "oceanwaves",
+        "type": "git",
+        "url": "file:///home/knyrps/code/tiny-dfr"
       }
     },
     "xwayland-satellite": {
