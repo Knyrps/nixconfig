@@ -481,11 +481,11 @@
     "tiny-dfr": {
       "flake": false,
       "locked": {
-        "lastModified": 1794962107,
-        "narHash": "sha256-JNO36Hm7RtAeAv/yREP8ceqaTOe03TaC7f0SLF0cRvA=",
+        "lastModified": 1794963294,
+        "narHash": "sha256-9IfW0JJ+X5R6LS67bVADHkfibbyviPObmz0CXJeL14Q=",
         "ref": "oceanwaves",
-        "rev": "afa97a92abfa9e871b3488217b32ba83c2fe4848",
-        "revCount": 139,
+        "rev": "467969e9e531f46692b12dcb77619a9e8dcda493",
+        "revCount": 140,
         "type": "git",
         "url": "file:///home/knyrps/code/tiny-dfr"
       },
