@@ -119,7 +119,11 @@
   };
 
   wallpaper = {
-    path = ../wallpapers/street.png;
+    # padded onto a large matching canvas so the texture edge lies offscreen:
+    # scaling the raw image left a 1px filtering fringe around it on screen
+    path = pkgs.runCommand "street-padded.png" { nativeBuildInputs = [ pkgs.imagemagick ]; } ''
+      magick ${../wallpapers/street.png} -background '#191919' -gravity center -extent 4096x2560 PNG24:$out
+    '';
     fill = "center";
     fill_color = "#191919";
   };
